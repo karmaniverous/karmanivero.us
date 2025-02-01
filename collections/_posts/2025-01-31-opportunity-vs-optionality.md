@@ -1,6 +1,6 @@
 ---
 # prettier-ignore
-title: "Opportunity vs Optionality: A Lesson From The Front"
+title: "Opportunity vs. Optionality: A Lesson From The Front"
 excerpt: "Success is about making decisions that are reasonably cheap when they are wrong, but pay off big when they are right."
 header:
   og_image: /assets/images/lemons-banner.jpg
@@ -16,6 +16,8 @@ tags:
 Back in October I launched [John Galt Services](https://johngalt.id) (JGS), an offshoring play that sources young multilingual professionals from across Indonesia and embeds them remotely with US, UK, and Canadian companies to help them establish a customer service or business development presence in Asia.
 
 We've run the usual gauntlet of challenges, which I'm finally getting around to documenting here. So... where to begin?
+
+> Success is about making decisions that are reasonably cheap when they are wrong, but pay off big when they are right.
 
 Let's talk about opportunity.
 
@@ -35,6 +37,8 @@ And I think there's a lesson in there.
 
 Recognizing and seizing opportunities is the bread and butter of entrepreneurship. And anybody who has been in the entrepreneuial game for very long will agree that opportunities are _everywhere_.
 
+> Virtually nobody is actually ready when a random opportunity taps them on the shoulder.
+
 Actually _seeing_ an opportunity when it shows up is a pattern-recognition challenge. It isn't hard: you just need to _miss_ enough of them, and they'll start popping out at you everywhere you go. Easy peasy.
 
 The trouble is, virtually nobody is actually _ready_ when a random opportunity taps them on the shoulder... and usually, by the time you get your feet under you, it's too late.
@@ -53,6 +57,8 @@ Let's go back to my Indonesian real estate company. We just wanted to buy some p
 
 So why bother?
 
+> The very best decisions you can make will often leave you sucking wind when opportunity comes knocking.
+
 Think about the other examples above:
 
 - You don't want your savings just sitting around in cash getting inflated away, right? Put your money to work and optimize your return!
@@ -69,6 +75,8 @@ As a strategy, under-optimizing on purpose is a tough sell. It's hard to justify
 
 It's also tricky: there's a fine line between under-optimizing your life to generate useful optionality and, you know, plain old sloppiness. You are GOING to "screw it up" by spending scarce resources to create optionality you wind up never needing.
 
+> As investments go, paying an insurance premium is like lighting your money on fire... until your house burns down.
+
 In pratice, I look at this as something like contributing to a retirement plan, or paying an insurance premium. With those, you're taking a small bite of your resources off the table, on a regular basis, in order to give yourself some wiggle room at some point in the future when something unexpected happens.
 
 The difference is that those cases are generally subtractive: you're just deliberately constraining your cash flow. But creating optionality is very often _additive:_ it may still be costing you a bit of money (and time), but you are generally using them to _do_ things that might be useful in the future.
@@ -84,6 +92,8 @@ Pattern recognition is useful. Failure is a powerful teacher, but humility is ke
 I don't want to present myself as some kind of crafty genius for having obtained a handy license ahead of time. I'm not.
 
 And that's exactly my point.
+
+> You don't have to be a genius to succeed in business, if you can just avoid doing things that are expensively foolish.
 
 People who find wild success in business (and in life) are those who do things that others do not. People who massively _fail_ at those things often meet the same description.
 
