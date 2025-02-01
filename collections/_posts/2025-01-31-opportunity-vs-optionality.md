@@ -6,6 +6,7 @@ header:
   og_image: /assets/images/lemons-banner.jpg
   teaser: /assets/images/lemons-square.jpg
 tags:
+  - business
   - johngalt
 ---
 
