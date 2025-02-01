@@ -36,7 +36,7 @@ And I think there's a lesson in there.
 
 ## Creating Optionality
 
-Recognizing and seizing opportunities is the bread and butter of entrepreneurship. And anybody who has been in the entrepreneuial game for very long will agree that opportunities are _everywhere_.
+Recognizing and seizing opportunities is the bread and butter of entrepreneurship. And anybody who has been in the entrepreneurial game for very long will agree that opportunities are _everywhere_.
 
 > Virtually nobody is actually ready when a random opportunity taps them on the shoulder.
 
@@ -78,7 +78,7 @@ It's also tricky: there's a fine line between under-optimizing your life to gene
 
 > As investments go, paying an insurance premium is right up there with lighting your money on fire... until your house burns down.
 
-In pratice, I look at this as something like contributing to a retirement plan, or paying an insurance premium. With those, you're taking a small bite of your resources off the table, on a regular basis, in order to give yourself some wiggle room at some point in the future when something unexpected happens.
+In practice, I look at this as something like contributing to a retirement plan, or paying an insurance premium. With those, you're taking a small bite of your resources off the table, on a regular basis, in order to give yourself some wiggle room at some point in the future when something unexpected happens.
 
 The difference is that those cases are generally subtractive: you're just deliberately constraining your cash flow. But creating optionality is very often _additive:_ it may still be costing you a bit of money (and time), but you are generally using them to _do_ things that might be useful in the future.
 
