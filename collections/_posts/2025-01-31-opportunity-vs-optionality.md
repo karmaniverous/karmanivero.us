@@ -3,15 +3,15 @@
 title: "Opportunity vs. Optionality: A Lesson From The Front"
 excerpt: "Success is about making decisions that are reasonably cheap when they are wrong, but pay off big when they are right."
 header:
-  og_image: /assets/images/lemons-banner.jpg
-  teaser: /assets/images/lemons-square.jpg
+  og_image: /assets/images/opportunity-vs-optionality-banner.jpg
+  teaser: /assets/images/opportunity-vs-optionality-square.jpg
 tags:
   - business
   - johngalt
 ---
 
 <figure class="align-left drop-image">
-    <img src="/assets/images/lemons-square.jpg">
+    <img src="/assets/images/opportunity-vs-optionality-square.jpg">
 </figure>
 
 Back in October I launched [John Galt Services](https://johngalt.id) (JGS), an offshoring play that sources young multilingual professionals from across Indonesia and embeds them remotely with US, UK, and Canadian companies to help them establish a customer service or business development presence in Asia.
