@@ -75,7 +75,7 @@ As a strategy, under-optimizing on purpose is a tough sell. It's hard to justify
 
 It's also tricky: there's a fine line between under-optimizing your life to generate useful optionality and, you know, plain old sloppiness. You are GOING to "screw it up" by spending scarce resources to create optionality you wind up never needing.
 
-> As investments go, paying an insurance premium is like lighting your money on fire... until your house burns down.
+> As investments go, paying an insurance premium is right up there with lighting your money on fire... until your house burns down.
 
 In pratice, I look at this as something like contributing to a retirement plan, or paying an insurance premium. With those, you're taking a small bite of your resources off the table, on a regular basis, in order to give yourself some wiggle room at some point in the future when something unexpected happens.
 
