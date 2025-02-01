@@ -6,7 +6,7 @@ search: false
 @charset "utf-8";
 
 @import "minimal-mistakes/skins/{{ site.minimal_mistakes_skin | default: 'default' }}"; // skin
-@import 'minimal-mistakes'; // main partials
+@import "minimal-mistakes"; // main partials
 
 html {
   /* apply a natural box layout model to all elements */
@@ -40,7 +40,8 @@ figure.drop-image {
   }
 }
 
-figure.drop-image + p::first-letter {
+figure.drop-image + p::first-letter,
+p.drop-cap::first-letter {
   @include breakpoint($small) {
     font-family: serif;
     initial-letter: 2;
