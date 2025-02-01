@@ -1,7 +1,7 @@
 ---
 # prettier-ignore
 title: "Opportunity vs Optionality: A Lesson From The Front"
-excerpt: ""
+excerpt: "Success is about making decisions that are reasonably cheap when they are wrong, but pay off big when they are right."
 header:
   og_image: /assets/images/lemons-banner.jpg
   teaser: /assets/images/lemons-square.jpg
