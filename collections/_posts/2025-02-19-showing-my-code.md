@@ -1,13 +1,26 @@
 ---
 # prettier-ignore
 title: "Showing My Code: An Open Response to Elon"
-excerpt: 'Elon Musk put out a call for coders: "Just show us your code!" Here''s mine.'
+excerpt: 'Elon Musk recently put out a call for coders: "Just show us your code!" Here''s mine.'
 header:
-  og_image: /assets/images/opportunity-vs-optionality-banner.jpg
-  teaser: /assets/images/opportunity-vs-optionality-square.jpg
+  og_image: /assets/images/showing-my-code-banner.jpg
+  teaser: /assets/images/showing-my-code-square.jpg
 tags:
-  - business
-  - johngalt
+  - agile
+  - design
+  - documentation
+  - entity-manager
+  - github
+  - javascript
+  - nextjs
+  - principles
+  - project-governance
+  - projects
+  - serverless
+  - template
+  - testing
+  - toolkits
+  - typescript
 toc: false
 ---
 
