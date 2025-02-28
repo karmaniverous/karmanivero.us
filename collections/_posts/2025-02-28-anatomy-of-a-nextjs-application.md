@@ -4,7 +4,7 @@ title: "Anatomy of a Next.js Application"
 excerpt: "Here's a useful way to think about a Next.js app that will be built by a team."
 header:
   og_image: /assets/images/nextjs-anatomy-banner.jpg
-  teaser: /assets/images/nextjs-anatomy-square.png
+  teaser: /assets/images/nextjs-anatomy-square.jpg
 tags:
   - nextjs
   - principles
@@ -12,7 +12,7 @@ tags:
 ---
 
 <figure class="align-left drop-image">
-    <img src="/assets/images/nextjs-anatomy-square.png">
+    <img src="/assets/images/nextjs-anatomy-square.jpg">
 </figure>
 
 I'm working with a new consulting client who is in a tearing rush to build a complex [Next.js](https://nextjs.org/) application in Typescript that will involve some legacy APIs and a couple of teams.
