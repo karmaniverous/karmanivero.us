@@ -73,7 +73,7 @@ Either way, the Next.js application must access Remote Back End services across 
 
 - **Via generated Typescript SDKs.** Type-safe SDKs and associated [Zod](https://zod.dev/) schemas can be generated efficiently as part of the build process directly from OpenAPI schemas using tools like [typed-openapi](https://github.com/astahmer/typed-openapi) & [openapi-generator-cli](https://github.com/OpenAPITools/openapi-generator-cli). _This is the preferred method!_
 
-Generating Typescript SDKs absolutely depends on the existence of related services, therefore acquiring or producing remote service OpenAPI specs should be a top project priority!
+Generating Typescript SDKs absolutely depends on the existence of related service OpenAPI specs. Therefore, **acquiring or producing remote service OpenAPI specs should be a top project priority!**
 
 ### Local Back End
 
