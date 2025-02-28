@@ -19,7 +19,7 @@ I'm working with a new consulting client who is in a tearing rush to build a com
 
 I wrote the following piece to help them think about the project in context, and it turned out sufficiently generic that I thought it might be useful to others.
 
-So here it is: a useful way to think about building a Next.js application.
+So here it is: a useful way to think about building a Next.js application in a team context.
 
 ## Principles
 
