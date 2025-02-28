@@ -115,7 +115,7 @@ Type-safety and generic architecture a HUGE factors in the creation of a high-qu
 
 This is also the EXACT place where many teams sacrifice code quality for fast-but-sloppy execution that generates a pile of tech debt. It is NEVER a good trade.
 
-The Component Layer should be articulated within the context of a themable component library that provides the necessary design framework and development tooling. I like [DaisyUI](https://daisyui.com/) and [Tailwind CSS](https://tailwindcss.com/).
+The Component Layer should be articulated within the context of a themeable component library that provides the necessary design framework and development tooling. I like [DaisyUI](https://daisyui.com/) and [Tailwind CSS](https://tailwindcss.com/).
 
 ### Design Layer
 
