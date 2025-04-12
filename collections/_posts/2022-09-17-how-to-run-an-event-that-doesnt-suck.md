@@ -256,8 +256,8 @@ about your qualifications, but it's probably more about your motivations. Find a
 balance: you can be qualified to lead a meeting AND not be a pompous asshole.
 
 **PRO TIP:** Write your bio once, memorize it, and refine it over time. You're
-the same person every time, right? So don't be afraid to use the same bio. {:
-.notice--info}
+the same person every time, right? So don't be afraid to use the same bio. 
+{: .notice--info}
 
 > If I'm here to TEACH you, I'm not that interesting. But if I'm here to LEARN
 > from you, suddenly I'm fascinating!
