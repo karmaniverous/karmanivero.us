@@ -1,7 +1,7 @@
 ---
 # prettier-ignore
-title: "Engineered Qualia, Confabulation, and Consciousness"
-excerpt: "Here's a useful way to think about a Next.js app that will be built by a team."
+title: "Engineered Qualia, Confabulation, and Emergent Consciousness"
+excerpt: "Can engineered qualia and AI self-reflection curb confabulation—and spark emergent consciousness? A deep dive into introspective machine learning."
 header:
   og_image: /assets/images/engineered-qualia-banner.jpg
   teaser: /assets/images/engineered-qualia-square.jpg
