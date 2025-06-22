@@ -1,6 +1,6 @@
 ---
 # prettier-ignore
-title: "Engineered Qualia: Introspective Layers to Reduce LLM Confabulation"
+title: "Engineered Qualia, Confabulation, and Consciousness"
 excerpt: "Here's a useful way to think about a Next.js app that will be built by a team."
 header:
   og_image: /assets/images/nextjs-anatomy-banner.jpg
