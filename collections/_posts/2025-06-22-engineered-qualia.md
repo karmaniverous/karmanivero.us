@@ -3,14 +3,14 @@
 title: "Engineered Qualia, Confabulation, and Consciousness"
 excerpt: "Here's a useful way to think about a Next.js app that will be built by a team."
 header:
-  og_image: /assets/images/nextjs-anatomy-banner.jpg
-  teaser: /assets/images/nextjs-anatomy-square.jpg
+  og_image: /assets/images/engineered-qualia-banner.jpg
+  teaser: /assets/images/engineered-qualia-square.jpg
 tags:
   - ai
 ---
 
 <figure class="align-left drop-image">
-    <img src="/assets/images/nextjs-anatomy-square.jpg">
+    <img src="/assets/images/engineered-qualia-square.jpg">
 </figure>
 
 Large Language Models ([LLMs]((https://en.wikipedia.org/wiki/Large_language_model)) are powerful but prone to [confabulation](https://en.wikipedia.org/wiki/Confabulation): a fancy term for *making stuff up*. Ask a modern LLM a question it *shouldn't* know, and it might confidently provide a detailed answer that sounds plausible but is entirely fabricated. 
