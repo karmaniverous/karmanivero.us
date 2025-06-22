@@ -13,7 +13,7 @@ tags:
     <img src="/assets/images/engineered-qualia-square.jpg">
 </figure>
 
-Large Language Models ([LLMs]((https://en.wikipedia.org/wiki/Large_language_model)) are powerful but prone to [confabulation](https://en.wikipedia.org/wiki/Confabulation): a fancy term for *making stuff up*. Ask a modern LLM a question it *shouldn't* know, and it might confidently provide a detailed answer that sounds plausible but is entirely fabricated. 
+Large Language Models ([LLMs](https://en.wikipedia.org/wiki/Large_language_model)) are powerful but prone to [confabulation](https://en.wikipedia.org/wiki/Confabulation): a fancy term for *making stuff up*. Ask a modern LLM a question it *shouldn't* know, and it might confidently provide a detailed answer that sounds plausible but is entirely fabricated. 
 
 Humans do this too under certain conditions (neurologists use *confabulation* to describe memory-gap filling by patients), but in AI it’s a glaring reliability issue. Why do LLMs confabulate? In simple terms, today’s models have no genuine sense of **uncertainty** or “awareness” of their own knowledge gaps. They generate the most likely continuation of a prompt, even if that means smoothly **improvising facts**. Unlike a human expert who might say "I don't recall that detail," a vanilla LLM lacks an internal monitor to flag, "I'm just guessing here."
 
