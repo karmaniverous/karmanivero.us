@@ -15,6 +15,9 @@ tags:
 
 Large Language Models ([LLMs](https://en.wikipedia.org/wiki/Large_language_model)) are powerful but prone to [confabulation](https://en.wikipedia.org/wiki/Confabulation): a fancy term for *making stuff up*. Ask a modern LLM a question it *shouldn't* know, and it might confidently provide a detailed answer that sounds plausible but is entirely fabricated. 
 
+**H8ERS:** If you think this is just another AI mysticism piece, relax: I’m not theologizing. This is a concrete engineering proposal for self-monitoring in LLMs. The philosophical jargon is a metaphor, not a manifesto.
+{: .notice--warning}
+
 Humans do this too under certain conditions (neurologists use *confabulation* to describe memory-gap filling by patients), but in AI it’s a glaring reliability issue. Why do LLMs confabulate? In simple terms, today’s models have no genuine sense of **uncertainty** or “awareness” of their own knowledge gaps. They generate the most likely continuation of a prompt, even if that means smoothly **improvising facts**. Unlike a human expert who might say "I don't recall that detail," a vanilla LLM lacks an internal monitor to flag, "I'm just guessing here."
 
 What if we could give LLMs something akin to an **inner voice or eye**: a way to examine their own intermediate state and catch confabulations before they escape into the output? This is where the concept of *engineered qualia* comes in. 
