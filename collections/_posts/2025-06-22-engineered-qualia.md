@@ -86,7 +86,7 @@ How might we practically implement such introspective signals?
 
 One approach is to introduce a dedicated *observer module* that runs alongside the main model (the “actor”). This separation of roles is reminiscent of the *actor–critic framework* in reinforcement learning, where one network (actor) proposes actions and another (critic) evaluates them. In our context, the LLM is the actor generating a candidate response, and the observer is a secondary model (or sub-model) that examines the actor’s response or reasoning trace and provides feedback: effectively a commentary on the actor’s internal performance.
 
-> Only a self-monitoring AI can operate in the real world without constant human oversight.
+> _**Ipso facto:**_ Only a self-monitoring AI can operate in the real world without constant human oversight.
 
 Notably, this idea isn’t pure fantasy; it connects to several strands of recent AI research:
 
