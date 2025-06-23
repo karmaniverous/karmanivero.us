@@ -17,7 +17,7 @@ tags:
 
 Here in Indonesia, WhatsApp is the de-facto official phone and messaging system. People use it _far_ more than traditional phone & SMS, and most businesses maintain a WhatsApp account for customer service.
 
-Since I spend so much time in front of my laptop, I make extensive use of the WhatsApp desktop client. Just make sense.
+Since I spend so much time in front of my laptop, I make extensive use of the WhatsApp desktop client. Just makes sense.
 
 **TL/DR:** WhatsApp publishes a beta Windows desktop client. [Download it here](https://apps.microsoft.com/detail/9nbdxk71nk08) and attach it to a second WhatsApp account!
 {: .notice--info}
