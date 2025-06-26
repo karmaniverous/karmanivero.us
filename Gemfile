@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-gem "minimal-mistakes-jekyll", "~> 4.26.0"
+gem "minimal-mistakes-jekyll", "~> 4.27.0"
 
 gem "base64"
 gem "bigdecimal"
@@ -14,7 +14,7 @@ group :jekyll_plugins do
     gem "jekyll-feed"
     gem "jekyll-gist"
     gem "jekyll-include-cache"
-    gem "jekyll-paginate"
+    gem "jekyll-paginate-v2"
     gem "jekyll-redirect-from"
     gem "jekyll-sitemap"
     gem "kramdown-parser-gfm"

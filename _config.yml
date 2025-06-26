@@ -123,9 +123,6 @@ author:
     - label: "X"
       icon: "fa-brands fa-square-x-twitter"
       url: "https://twitter.com/karmaniverous"
-    - label: "Mastodon"
-      icon: "fa-brands fa-mastodon"
-      url: "https://techhub.social/@karmaniverous"
     - label: "GitHub"
       icon: "fa-brands fa-github"
       url: "https://github.com/karmaniverous"
@@ -231,16 +228,12 @@ sass:
 permalink: /:categories/:title/
 timezone: # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
-# Pagination with jekyll-paginate
-paginate: 8 # amount of posts to show
-paginate_path: /page/:num/
-
 # Pagination with jekyll-paginate-v2
 # See https://github.com/sverrirs/jekyll-paginate-v2/blob/master/README-GENERATOR.md#site-configuration
 #   for configuration details
 pagination:
   # Set enabled to true to use paginate v2
-  # enabled: true
+  enabled: true
   debug: true
   collection: "posts"
   per_page: 8
@@ -256,16 +249,18 @@ pagination:
     before: 2
     after: 2
 
+# TODO: Refactor Topics page with Autopages: https://github.com/sverrirs/jekyll-paginate-v2/blob/master/README-AUTOPAGES.md
+
 # Plugins (previously gems:)
 plugins:
   - jekyll-archives
-  - jekyll-paginate
-  - jekyll-sitemap
-  - jekyll-gist
   - jekyll-feed
+  - jekyll-gist
   - jekyll-include-cache
+  - jekyll-paginate-v2
   - jekyll-redirect-from
-
+  - jekyll-sitemap
+  
 # Archives
 #  Type
 #  - GitHub Pages compatible archive pages built with Liquid ~> type: liquid (default)
@@ -308,16 +303,16 @@ defaults:
       path: ""
       type: posts
     values:
+      author_profile: true
+      comments: true
       excerpt_separator: "<!--more-->"
       layout: single
-      author_profile: true
       read_time: true
-      comments: true
+      related: true
       share: true
       show_date: true
-      related: true
-      toc: true
       toc_sticky: true
+      toc: true
   # _entity-manager
   - scope:
       path: ""

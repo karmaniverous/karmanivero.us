@@ -2,6 +2,8 @@
 title: a bullet point
 tagline: resume bullets<br />may read differently at the<br />threshhold of heaven
 layout: splash
+pagination:
+  enabled: true
 header:
   overlay_filter: rgba(32, 0, 32, 0.45)
   overlay_image: /assets/images/splash-header.jpg
@@ -35,7 +37,7 @@ feature_row:
 
 {% include feature_row %}
 
-<h2 class="archive__subtitle">
+<h2>
   {{ site.data.ui-text[site.locale].recent_posts | default: "incoherent screeds" }}
 </h2>
 
