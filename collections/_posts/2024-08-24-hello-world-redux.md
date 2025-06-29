@@ -1,7 +1,7 @@
 ---
 # prettier-ignore
 title: "Hello World! (Redux)"
-excerpt: "Rediscovering blogging. Again."
+excerpt: "Rediscovering blogging again. Again."
 header:
   og_image: /assets/images/hello-world-redux.png
   teaser: /assets/images/hello-world-redux.png

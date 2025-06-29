@@ -3,8 +3,8 @@
 title: "Directing TEL Links to WhatsApp Desktop in Windows"
 excerpt: "Wish you could click on a phone link in Windows and open it in your WhatsApp app? Here's how!"
 header:
-  og_image: /assets/images/dual-whatsapp-banner.jpg
-  teaser: /assets/images/dual-whatsapp-square.jpg
+  og_image: /assets/images/whtsapp-tel-banner.jpg
+  teaser: /assets/images/whtsapp-tel-square.jpg
 tags:
   - tips
   - whatsapp
@@ -12,7 +12,7 @@ tags:
 ---
 
 <figure class="align-left drop-image">
-    <img src="/assets/images/dual-whatsapp-square.jpg">
+    <img src="/assets/images/whtsapp-tel-square.jpg">
 </figure>
 
 Here in Indonesia, WhatsApp is the go-to messaging service. SMS is for spam. WhatsApp is for actually getting things done.
