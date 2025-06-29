@@ -8,6 +8,7 @@ header:
   teaser: /assets/images/dual-whatsapp-square.jpg
 tags:
   - tips
+  - whatsapp
   - windows
 ---
 
@@ -38,3 +39,5 @@ You're welcome. 😎
 
 I'm not a Mac user, but **I bet there's a similar solution for MacOS.** If you know what it is, please share it in the comments!
 {: .notice--info}
+
+P.S. If you want to click on a phone number in Windows and have it open in WhatsApp, check out my post on [Directing TEL Links to WhatsApp Desktop in Windows](/directing-tel-links-to-whatsapp-desktop-in-windows/).
