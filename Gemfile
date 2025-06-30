@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-gem "minimal-mistakes-jekyll", "~> 4.27.0"
+gem "minimal-mistakes-jekyll"
 
 gem "base64"
 gem "bigdecimal"

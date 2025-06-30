@@ -51,7 +51,7 @@ Problem solved.
 My suggestion: take the easy road from the
 [Quick-Start Guide](https://mmistakes.github.io/minimal-mistakes/docs/quick-start-guide/)
 and create your repo from the
-[Minimal Mistakes template](https://github.com/mmistakes/mm-github-pages-starter/generate).
+[Minimal Mistakes template](https://github.com/new?template_name=mm-github-pages-starter&template_owner=mmistakes).
 You can be up and running in single-digit minutes. It just WORKS.
 
 I only had one issue, which turned out to have an easy fix.

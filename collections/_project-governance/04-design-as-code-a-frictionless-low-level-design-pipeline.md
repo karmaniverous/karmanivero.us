@@ -236,7 +236,7 @@ So there's the big reveal regarding the thousand-line Swagger specification pres
 
 ## Low-Level Design For Real
 
-In another article we explored [an example of high-level design](http://localhost:4000/toolkits/project-governance/turning-the-crank-design-as-a-mechanical-process/#a-redacted-example) from the [VeteranCrowd](https://veterancrowd.com) project. We immediately had to deal with the following reality:
+In another article we explored [an example of high-level design](/toolkits/project-governance/turning-the-crank-design-as-a-mechanical-process/#a-redacted-example) from the [VeteranCrowd](https://veterancrowd.com) project. We immediately had to deal with the following reality:
 
 > Really useful design artifacts are specific to the problem they’re solving, and proprietary to the organization that’s solving it!
 
@@ -348,7 +348,7 @@ A basic principle of economics is that the more expensive anything is, the less 
 
 > As in life, so in design!
 
-In [_Turning the Crank_](<(/toolkits/project-governance/turning-the-crank-design-as-a-mechanical-process)>), I showed you a few very fancy high-level design diagrams like this one:
+In [_Turning the Crank_](/toolkits/project-governance/turning-the-crank-design-as-a-mechanical-process), I showed you a few very fancy high-level design diagrams like this one:
 
 {% include figure image_path="/assets/images/architecture-vc-business-process.png" caption="_VeteranCrowd core business process._" popup=true %}
 

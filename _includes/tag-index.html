@@ -1,24 +1,17 @@
-{% assign tags = "" | split: "" %}
-{% for siteTag in site.tags %}
-  {% assign tags = tags | push: siteTag[0] %}
-{% endfor %}
-
-{% assign tags = tags | sort %}
+{% assign tags = "" | split: "" %} {% for siteTag in site.tags %} {%
+assign tags = tags | push: siteTag[0] %} {% endfor %} {% assign tags
+= tags | sort %}
 
 <ul class="taxonomy__index">
-  {% for tag in tags %}
-    {% for siteTag in site.tags %}
-      {% if siteTag[0] == tag %}
-        {% assign posts = siteTag[1] | size %}
-        {% break %}
-      {% endif %}
-    {% endfor %}
+  {% for tag in tags %} {% for siteTag in site.tags %} {% if
+  siteTag[0] == tag %} {% assign posts = siteTag[1] | size %} {%
+  break %} {% endif %} {% endfor %}
 
-    <li>
-      <a href="/topics/{{ tag | slugify }}">
-        <strong>{{ tag }}</strong>
-        <span class="taxonomy__count">{{ posts }}</span>
-      </a>
-    </li>
+  <li>
+    <a href="/topics/{{ tag | slugify }}/">
+      <strong>{{ tag }}</strong>
+      <span class="taxonomy__count">{{ posts }}</span>
+    </a>
+  </li>
   {% endfor %}
 </ul>

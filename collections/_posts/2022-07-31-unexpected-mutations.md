@@ -18,7 +18,7 @@ toc: false
 Today was one of those days.
 
 I'm writing a web3 application on top of
-[`web3.js`](https://github.com/ChainSafe/web3.js). If you don't know, `web3` is
+[`web3.js`](https://github.com/web3/web3.js). If you don't know, `web3` is
 one of several libraries out there that help Javascript developers connect to
 and manipulate Ethereum blockchains.
 

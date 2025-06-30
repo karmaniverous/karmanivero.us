@@ -17,7 +17,7 @@ toc: true
 </figure>
 
 I've got a very handy
-[Next.js project template](https://github.com/karmaniverous/template-nextjs) out
+[Next.js project template](https://github.com/karmaniverous/nextjs-template) out
 there that I am using as the basis of a number of projects.
 
 I host all of these projects on [Vercel](https://vercel.com/), because srsly why
