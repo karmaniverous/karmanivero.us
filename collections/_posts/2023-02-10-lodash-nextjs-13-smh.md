@@ -58,7 +58,7 @@ That works for my logging application, but in the more general case I'd be givin
 
 Meanwhile, I'm subscribed to [this GitHub issue](https://github.com/lodash/lodash/issues/5525) and am tracking it closely!
 
-# Update
+## Update
 
 The edge-network logging problem turned out to be enough of a pain in the ass that I published my new [`edge-logger`](https://www.npmjs.com/package/@karmaniverous/edge-logger) package to solve it across all my projects.
 
