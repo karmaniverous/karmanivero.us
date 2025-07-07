@@ -5,6 +5,8 @@ excerpt: "An ES6 NPM package project template featuring a CLI, test support, aut
 header:
   og_image: /assets/images/logo-npm.png
   teaser: /assets/images/logo-npm.png
+redirect_from:
+  - /blog/npm-package-template/
 tags:   
   - javascript
   - npm

@@ -7,6 +7,8 @@ header:
   teaser: /assets/images/iteration.png
 permalink: /toolkits/project-governance/a-modern-agile-project-manifesto/
 related: true
+redirect_from:
+  - /blog/a-modern-agile-project-manifesto/
 tags:
   - agile
   - atlassian

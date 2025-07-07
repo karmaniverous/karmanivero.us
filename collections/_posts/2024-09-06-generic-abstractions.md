@@ -5,6 +5,8 @@ excerpt: "Modern software development works just like any other Hero's Journey: 
 header:
   og_image: /assets/images/generic-abstractions-og.jpg
   teaser: /assets/images/generic-abstractions.png
+redirect_from:
+  - /blog/generic-abstractions/
 tags:
   - entity-manager
   - projects

@@ -5,6 +5,8 @@ excerpt: "I’m laying down a big bet on Bali! Let me share the evidence that ha
 header:
   og_image: /assets/images/betting-on-bali-banner.jpg
   teaser: /assets/images/betting-on-bali-square.jpg
+redirect_from:
+  - /blog/betting-on-bali-my-journey-into-the-offshoring-business/
 tags:
   - bali
   - offshoring

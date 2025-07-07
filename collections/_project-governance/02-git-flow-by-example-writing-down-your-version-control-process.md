@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/git-flow-feature-bugfix-branches.png
   teaser: /assets/images/git-flow-square.png
 permalink: /toolkits/project-governance/git-flow-by-example-writing-down-your-version-control-process/
+redirect_from:
+  - /blog/git-flow-by-example-writing-down-your-version-control-process/
 related: true
 tags:
   - agile

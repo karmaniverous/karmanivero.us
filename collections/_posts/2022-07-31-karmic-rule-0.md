@@ -5,7 +5,9 @@ excerpt: "Minimize external dependencies and try not to use shitty libraries. â€
 header:
   og_image: /assets/images/dharma-wheel.png
   teaser: /assets/images/dharma-wheel.png
-tags:
+redirect_from:
+  - /blog/karmic-rule-0/
+ags:
   - karmic-rules
   - principles
   - design

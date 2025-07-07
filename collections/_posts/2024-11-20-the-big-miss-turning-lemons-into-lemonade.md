@@ -5,6 +5,8 @@ excerpt: "Today was one of those days when I question my life choices. Watch me 
 header:
   og_image: /assets/images/lemons-banner.jpg
   teaser: /assets/images/lemons-square.jpg
+redirect_from:
+  - /blog/the-big-miss-turning-lemons-into-lemonade/
 tags:
   - design
   - dynamodb

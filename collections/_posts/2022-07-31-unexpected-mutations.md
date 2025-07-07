@@ -5,6 +5,8 @@ excerpt: "An unexpected (and probably unintended) function parameter mutation in
 header:
   og_image: /assets/images/logo-web3js.jpg
   teaser: /assets/images/logo-web3js.jpg
+redirect_from:
+  - /blog/unexpected-mutations/
 tags:
   - web3
   - javascript

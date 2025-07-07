@@ -5,6 +5,8 @@ excerpt: 'Elon Musk recently put out a call for coders: "Just show us your code!
 header:
   og_image: /assets/images/showing-my-code-banner.jpg
   teaser: /assets/images/showing-my-code-square.jpg
+redirect_from:
+  - /blog/showing-my-code/
 tags:
   - agile
   - design

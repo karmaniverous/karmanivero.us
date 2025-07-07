@@ -5,6 +5,8 @@ excerpt: "Watch a complex Javascript configuration object collapse into declarat
 header:
   og_image: /assets/images/what-good-looks-like-banner.jpg
   teaser: /assets/images/what-good-looks-like-square.jpg
+redirect_from:
+  - /blog/what-good-looks-like-a-real-world-typescript-refactor/
 tags:
   - design
   - entity-manager

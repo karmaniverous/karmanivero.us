@@ -6,6 +6,8 @@ header:
   overlay_image: /assets/collections/project-governance/design-as-code-banner.jpg
   teaser: /assets/collections/project-governance/design-as-code-square.jpg
 permalink: /toolkits/project-governance/design-as-code-a-frictionless-low-level-design-pipeline/
+redirect_from:
+  - /blog/design-as-code-a-frictionless-low-level-design-pipeline/
 swagger: true
 related: true
 tags:

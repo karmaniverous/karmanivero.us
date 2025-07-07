@@ -5,6 +5,8 @@ excerpt: "Nothing raises issues like contact with reality. – Karmic Rules for 
 header:
   og_image: /assets/images/dharma-wheel.png
   teaser: /assets/images/dharma-wheel.png
+redirect_from:
+  - /blog/karmic-rule-2/
 tags:
   - agile
   - ethics

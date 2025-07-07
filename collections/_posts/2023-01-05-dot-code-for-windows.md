@@ -5,6 +5,8 @@ excerpt: "An AutoHotKey script that launches VS Code with the open folder or sel
 header:
   og_image: /assets/images/logo-autohotkey.png
   teaser: /assets/images/logo-autohotkey.png
+redirect_from:
+  - /blog/dot-code-for-windows/
 tags:
   - autohotkey
   - projects

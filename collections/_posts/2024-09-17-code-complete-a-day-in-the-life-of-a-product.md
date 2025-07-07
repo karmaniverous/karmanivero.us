@@ -5,6 +5,8 @@ excerpt: "We’re all professionals here, right? And we all know there’s often
 header:
   og_image: /assets/images/code-complete-tests-preview.jpg
   teaser: /assets/images/code-complete-tests.jpg
+redirect_from:
+  - /blog/code-complete-a-day-in-the-life-of-a-product/
 tags:
   - aws
   - design

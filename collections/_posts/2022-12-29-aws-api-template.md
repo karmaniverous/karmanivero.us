@@ -5,6 +5,8 @@ excerpt: "Config-driven AWS API ES6 template integrating federated Cognito User 
 header:
   og_image: /assets/images/logo-aws.png
   teaser: /assets/images/logo-aws.png
+redirect_from:
+  - /blog/aws-api-template/
 tags:
   - aws
   - javascript

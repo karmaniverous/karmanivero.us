@@ -5,6 +5,8 @@ excerpt: "Wish you could click on a phone link in Windows and open it in your Wh
 header:
   og_image: /assets/images/whatsapp-tel-banner.jpg
   teaser: /assets/images/whatsapp-tel-square.jpg
+redirect_from:
+  - /blog/directing-tel-links-to-whatsapp-desktop-in-windows/
 tags:
   - tips
   - whatsapp

@@ -5,6 +5,8 @@ excerpt: "Your project depends on a GitHub repo template that has released a new
 header:
   og_image: /assets/images/git-diff-square.png
   teaser: /assets/images/git-diff-square.png
+redirect_from:
+  - /blog/installing-github-repo-template-updates/
 tags:
   - github
 ---

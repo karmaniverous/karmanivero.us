@@ -5,6 +5,8 @@ excerpt: "Success is about making decisions that are reasonably cheap when they 
 header:
   og_image: /assets/images/opportunity-vs-optionality-banner.jpg
   teaser: /assets/images/opportunity-vs-optionality-square.jpg
+redirect_from:
+  - /blog/opportunity-vs-optionality/
 tags:
   - business
   - johngalt

@@ -5,6 +5,8 @@ excerpt: "Logging is an implementation decision that should be deferred as late 
 header:
   og_image: https://raw.githubusercontent.com/karmaniverous/loggable/main/assets/loggable-banner.jpg
   teaser: https://raw.githubusercontent.com/karmaniverous/loggable/main/assets/loggable-square.jpg
+redirect_from:
+  - /blog/loggable-a-typescript-mixin-for-generic-class-logging/
 tags:
   - design
   - entity-manager

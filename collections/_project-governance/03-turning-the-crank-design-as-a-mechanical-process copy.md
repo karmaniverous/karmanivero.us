@@ -6,6 +6,8 @@ header:
   overlay_image: /assets/images/architecture-banner.jpg
   teaser: /assets/images/architecture-square.jpg
 permalink: /toolkits/project-governance/turning-the-crank-design-as-a-mechanical-process/
+redirect_from:
+  - /blog/turning-the-crank-design-as-a-mechanical-process/
 related: true
 tags:
   - agile

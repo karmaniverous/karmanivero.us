@@ -5,6 +5,8 @@ excerpt: "Here's a useful way to think about a Next.js app that will be built by
 header:
   og_image: /assets/images/nextjs-anatomy-banner.jpg
   teaser: /assets/images/nextjs-anatomy-square.jpg
+redirect_from:
+  - /blog/anatomy-of-a-nextjs-application/
 tags:
   - nextjs
   - principles

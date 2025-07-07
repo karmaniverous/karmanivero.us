@@ -5,6 +5,8 @@ excerpt: "Coming up with ideas is easy. Deciding which ones to execute on is HAR
 header:
   og_image: /assets/images/idea-discovery.jpg
   teaser: /assets/images/idea-discovery.jpg
+redirect_from:
+  - /blog/idea-discovery-on-github/
 tags:
   - tips
   - writing

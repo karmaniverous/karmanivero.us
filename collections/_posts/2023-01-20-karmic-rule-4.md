@@ -5,6 +5,8 @@ excerpt: "A work in progress is the best kind. – Karmic Rules for Writing Pret
 header:
   og_image: /assets/images/dharma-wheel.png
   teaser: /assets/images/dharma-wheel.png
+redirect_from:
+  - /blog/karmic-rule-4/
 tags:
   - karmic-rules
   - principles

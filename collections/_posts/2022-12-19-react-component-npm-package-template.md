@@ -5,6 +5,8 @@ excerpt: "An ES6 React component NPM package project template featuring front & 
 header:
   og_image: /assets/images/logo-react.png
   teaser: /assets/images/logo-react.png
+redirect_from:
+  - /blog/react-component-npm-package-template/
 tags:
   - javascript
   - npm

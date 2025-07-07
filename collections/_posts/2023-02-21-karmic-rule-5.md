@@ -5,6 +5,8 @@ excerpt: "generic logic + custom config ≫ custom logic – Karmic Rules for Wr
 header:
   og_image: /assets/images/dharma-wheel.png
   teaser: /assets/images/dharma-wheel.png
+redirect_from:
+  - /blog/karmic-rule-5/
 tags:
   - design
   - karmic-rules

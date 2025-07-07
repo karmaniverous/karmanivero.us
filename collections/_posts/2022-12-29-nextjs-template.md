@@ -5,6 +5,8 @@ excerpt: "A sweet Next.js project template. Integrates Redux Toolkit with with t
 header:
   og_image: /assets/images/logo-nextjs.png
   teaser: /assets/images/logo-nextjs.png
+redirect_from:
+  - /blog/nextjs-template/
 tags:
   - javascript
   - nextjs

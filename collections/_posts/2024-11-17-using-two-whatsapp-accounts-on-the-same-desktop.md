@@ -6,6 +6,8 @@ toc: false
 header:
   og_image: /assets/images/dual-whatsapp-banner.jpg
   teaser: /assets/images/dual-whatsapp-square.jpg
+redirect_from:
+  - /blog/using-two-whatsapp-accounts-on-the-same-desktop/
 tags:
   - tips
   - whatsapp

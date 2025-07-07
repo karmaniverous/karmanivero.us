@@ -5,6 +5,8 @@ excerpt: "If you want to get a complex process right, template it. – Karmic Ru
 header:
   og_image: /assets/images/dharma-wheel.png
   teaser: /assets/images/dharma-wheel.png
+redirect_from:
+  - /blog/karmic-rule-3/
 tags:
   - design
   - karmic-rules

@@ -5,6 +5,8 @@ excerpt: "If you use Typescript and are still using Lodash: stop. It's time for 
 header:
   og_image: /assets/images/radash-the-new-lodash.png
   teaser: /assets/images/radash-the-new-lodash.png
+redirect_from:
+  - /blog/radash-the-new-lodash/
 tags:
   - typescript
 toc: false
