@@ -26,7 +26,7 @@ But there are so MANY platforms. And I really like posting in short form on X. S
 
 So now we have the lexical equivalent of a fragmented code base: I've got SO many projects, with SO much documentation, that even though I really don't post much in long form any more, I still need a way to bring all that stuff together in one place.
 
-Last week I was patching up my [TypeScript NPM Package Template](https://github.com/karmaniverous/npm-package-template-ts) and, while scratching my head over documenting the API, I ran smack into [TypeDoc](https://typedoc.org/). It took a minute to understand that TypeDoc's output will integrate seamlessly with an existing GitHub Pages domain, [like this](https://karmanivero.us/npm-package-template-ts/).
+Last week I was patching up my [TypeScript NPM Package Template](https://github.com/karmaniverous/npm-package-template-ts) and, while scratching my head over documenting the API, I ran smack into [TypeDoc](https://typedoc.org/). It took a minute to understand that TypeDoc's output will integrate seamlessly with an existing GitHub Pages domain, [like this](https://docs.karmanivero.us/npm-package-template-ts/).
 
 Yah.
 
