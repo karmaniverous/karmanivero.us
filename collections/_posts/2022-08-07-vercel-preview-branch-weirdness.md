@@ -137,7 +137,8 @@ Pretty obvious what is going on here: despite the clear indication that my
 custom domain is a `preview` deployment, Vercel has set the
 `NEXT_PUBLIC_VERCEL_ENV` environment variable to `production`.
 
-😐 {: style="font-size: 3em; text-align:center;"}
+😐
+{: style="font-size: 3em; text-align:center;"}
 
 ## The Solution (Kind Of)
 
