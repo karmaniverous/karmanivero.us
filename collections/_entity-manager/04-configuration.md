@@ -159,7 +159,7 @@ A `TranscodeMap` is a simple Record type that defines:
 
 - the type each transcode encodes into or decodes from a string value.
 
-For example, here is the definition of the [`DefaultTranscodeMap`](https://docs.karmanivero.us/entity-manager/interfaces/entity_manager.DefaultTranscodeMap.html) type, which drives the [`defaultTranscodes`](https://docs.karmanivero.us/entity-manager/variables/entity_manager.defaultTranscodes.html) object:
+For example, here is the definition of the [`DefaultTranscodeMap`](https://docs.karmanivero.us/entity-manager/interfaces/entity_manager.DefaultTranscodeMap.html) type, which drives the [`defaultTranscodes`](https://docs.karmanivero.us/entity-tools/variables/entity_tools.defaultTranscodes.html) object:
 
 ```ts
 import { type TranscodeMap } from `@karmaniverous/entity-manager`;
@@ -278,7 +278,7 @@ interface User extends Entity {
 
 ## The `EntityMap` Type
 
-The [`EntityMap`](https://docs.karmanivero.us/entity-manager/types/entity_manager.EntityMap.html) type is a simple Record type that defines the entities in your data model and assigns their respective `Entity` types. An `EntityMap` type should follow these conventions:
+The [`EntityMap`](https://docs.karmanivero.us/entity-tools/types/entity_tools.EntityMap.html) type is a simple Record type that defines the entities in your data model and assigns their respective `Entity` types. An `EntityMap` type should follow these conventions:
 
 - Each key is the token by which an Entity will be referenced throughout your configuration. All entities should be represented.
 
