@@ -145,7 +145,7 @@ custom domain is a `preview` deployment, Vercel has set the
 I'm not going to go very far out of my way to fix this.
 
 Instead, I've opened
-[a ticket](https://github.com/vercel/vercel/discussions/8340) with Vercel and
+[a ticket](https://github.com/vercel/community/discussions/775) with Vercel and
 hope they will resolve the issue soon. Meanwhile, I've altered all my preview
 deployment links to point to the (way less sexy) automatically generated
 domains.

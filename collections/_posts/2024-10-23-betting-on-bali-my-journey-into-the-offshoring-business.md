@@ -40,7 +40,7 @@ According to the [EF English Proficiency Index 2022](https://www.ef.com/assetscd
 
 The rise of the [digital nomad](https://en.wikipedia.org/wiki/Digital_nomad) subculture has fostered a tech-savvy environment on Bali.
 
-Co-working spaces like [Tropical Nomad](https://tropicalnomadcoworking.com/) (where I'm sitting right now) and [BWork Bali](https://bworkbali.com/) offer training programs and networking opportunities that attract a ton of locals. Indonesian universities like [Udayana University](https://www.unud.ac.id/en/) produce graduates proficient in software development and familiar with Customer Relationship Management (CRM) systems and help desk software.
+Co-working spaces like [Tropical Nomad](https://tropicalnomadcoworking.com/) (where I'm sitting right now) and [BWork Bali](https://bworkbali.com/) offer training programs and networking opportunities that attract a ton of locals. Indonesian universities like [Udayana University](https://www.unud.ac.id/?lang=en) produce graduates proficient in software development and familiar with Customer Relationship Management (CRM) systems and help desk software.
 
 Moreover, according to the [Indonesia Digital Talent Report 2022](https://jakartaglobe.id/tech/indonesias-digital-talent-pool-grows-significantly-under-jokowis-leadership), there has been a significant increase in the number of tech graduates and professionals in Indonesia, and Bali's a major contributor due to its growing tech community.
 

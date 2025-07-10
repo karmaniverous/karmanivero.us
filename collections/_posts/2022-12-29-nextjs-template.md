@@ -66,7 +66,7 @@ Because this is a Next.js template, it works perfectly when deployed to [Vercel]
 
 **Use [VS Code](https://code.visualstudio.com/) as your code editor!** Not an absolute requirement, but you'll be glad you did.
 
-1.  [Click here](https://github.com/karmaniverous/nextja-template/generate) to generate a new repository from this template.
+1.  [Click here](https://github.com/new?template_name=nextjs-template) to generate a new repository from this template.
 
 1.  Clone the new repository to your local machine.
 
@@ -304,7 +304,7 @@ The issues:
 
 - There is no easy way to get Next.js to load different dotenv files from a different location.
 
-See the [Next.js docs](https://nextjs.org/docs/basic-features/environment-variables) for more info. Meanwhile, deployment environments also get a say.
+See the [Next.js docs](https://nextjs.org/docs/pages/guides/environment-variables) for more info. Meanwhile, deployment environments also get a say.
 
 Next.js can only load the files that are actually available to it. On your local development environment, everything will work as expected. [Vercel](https://vercel.com/solutions/nextjs) (the native Next.js platform) and [AWS Amplify](https://docs.amplify.aws/guides/hosting/nextjs/q/platform/js/) (also an excellent choice) expose different sets of files to the Next.js build engine at different points in the process.
 
