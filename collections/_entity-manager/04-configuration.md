@@ -297,7 +297,7 @@ interface MyEntityMap extends EntityMap {
 
 ## The Config Type
 
-The [`EntityManager`](https://docs.karmanivero.us/entity-manager/classes/entity_manager.EntityManager.html) class constructor takes a single argument of the [`Config`](https://docs.karmanivero.us/entity-manager/types/entity_manager.Config.html) type.
+The [`EntityManager`](https://docs.karmanivero.us/entity-manager/classes/index.EntityManager.html) class constructor takes a single argument of the [`Config`](https://docs.karmanivero.us/entity-manager/types/entity_manager.Config.html) type.
 
 `Config` is a highly complex type, which encapsulates numerous rules whose net effect is to prevent the developer from creating an invalid **Entity Manager** configuration.
 
@@ -729,6 +729,6 @@ import { defaultTranscodes } from `@karmaniverous/entity-manager`;
 const config = { /* same as above */ };
 ```
 
-The [`EntityManager` constructor](https://docs.karmanivero.us/entity-manager/classes/entity_manager.EntityManager.html#constructor) will still validate your configuration at runtime, so you can be confident that it is correct before proceeding.
+The [`EntityManager` constructor](https://docs.karmanivero.us/entity-manager/classes/index.EntityManager.html#constructor) will still validate your configuration at runtime, so you can be confident that it is correct before proceeding.
 
 Having said that: if you are working in Javascript, you should _really_ consider switching to Typescript! The benefits are enormous, and the learning curve is not as steep as you might think.
