@@ -155,6 +155,25 @@ Write variable expressions in serverless.yml using the full Lodash feature set, 
 
 </div>
 
+## STAN := STAN Tames Autoregressive Nonsense
+
+STAN is a CLI that creates a single, reproducible source of truth for AI‑assisted development by packaging your code and deterministic script outputs (build, test, lint, typecheck) into a tarball.
+
+STAN optionally writes a diff archive of changed files, maintains a snapshot for meaningful comparisons, and can “combine” script outputs inside the archives for clean workspaces.
+
+The `stan run` command executes your configured scripts concurrently or sequentially, while `stan snap` baselines diffs and `stan patch` safely applies repo‑root‑relative patches.
+
+The result is portable, auditable context that keeps your AI (and teammates) aligned with what’s actually in your repo.
+
+<div class="button-row--left">
+    <a href="https://docs.karmanivero.us/stan" class="btn btn--info btn--large">API Docs</a>
+
+    <a href="https://github.com/karmaniverous/stan" class="btn btn--primary btn--large"><i class="fa-brands fa-github fa-2xl"></i></a>
+
+    <a href="https://www.npmjs.com/package/@karmaniverous/stan" class="btn btn--primary btn--large"><i class="fa-brands fa-npm fa-2xl"></i></a>
+
+</div>
+
 ## string-utilities
 
 String utilities & tagged template functions I use a lot. Super tree-shakable package so use what you need at very little cost!
