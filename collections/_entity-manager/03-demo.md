@@ -1,5 +1,5 @@
 ---
-title: 'Entity Manager: A Demonstration'
+title: "Entity Manager: A Demonstration"
 excerpt: Presenting a step-by-step Typescript implementation of a realistic data model against DynamoDB, with the help of Entity Manager.
 permalink: /projects/entity-manager/demo/
 header:
@@ -78,7 +78,7 @@ After you have Docker Desktop installed & running, follow these steps:
 That's it! Check your work by running:
 
 ```bash
-npm test
+npm run test
 ```
 
 If all the tests pass, you're ready to start exploring the code!
@@ -101,7 +101,7 @@ All packages in the **Entity Manager** ecosystem perform extensive debug logging
 Visit [`src/util/logger.ts`](https://github.com/karmaniverous/entity-manager-demo/blob/main/src/util/logger.ts) to see this code in context.
 
 ```ts
-import { controlledProxy } from '@karmaniverous/controlled-proxy';
+import { controlledProxy } from "@karmaniverous/controlled-proxy";
 
 /**
  * Minimal logger wiring for the demo.
@@ -128,7 +128,7 @@ The proxy keeps library-level debug logs quiet while preserving your own logs an
 
 ## `EntityManager` Configuration
 
-{% include figure image_path="https://raw.githubusercontent.com/karmaniverous/entity-manager-demo/main/assets/entityManager.png" caption="_`EntityManager` configuration._" %}
+{% include figure image_path="https://raw.githubusercontent.com/karmaniverous/entity-manager-demo/main/assets/entityManager.png" caption="_`EntityManager` configuration._" popup=true %}
 
 **Entity Manager** is now a values‑first + schema‑first tool:
 
@@ -140,10 +140,10 @@ In this demo, Email and User schemas live alongside their types:
 
 ```ts
 // src/entity-manager/Email.ts
-import type { EntityClientRecordByToken } from '@karmaniverous/entity-manager';
-import { z } from 'zod';
+import type { EntityClientRecordByToken } from "@karmaniverous/entity-manager";
+import { z } from "zod";
 
-import { entityClient } from '../entity-manager/entityClient';
+import { entityClient } from "../entity-manager/entityClient";
 
 /**
  * Email domain schema (base fields only).
@@ -157,16 +157,16 @@ export const emailSchema = z.object({
 export type EmailItem = z.infer<typeof emailSchema>;
 export type EmailRecord = EntityClientRecordByToken<
   typeof entityClient,
-  'email'
+  "email"
 >;
 ```
 
 ```ts
 // src/entity-manager/User.ts
-import type { EntityClientRecordByToken } from '@karmaniverous/entity-manager';
-import { z } from 'zod';
+import type { EntityClientRecordByToken } from "@karmaniverous/entity-manager";
+import { z } from "zod";
 
-import { entityClient } from '../entity-manager/entityClient';
+import { entityClient } from "../entity-manager/entityClient";
 
 /**
  * User domain schema (base fields only).
@@ -184,7 +184,10 @@ export const userSchema = z.object({
 });
 
 export type UserItem = z.infer<typeof userSchema>;
-export type UserRecord = EntityClientRecordByToken<typeof entityClient, 'user'>;
+export type UserRecord = EntityClientRecordByToken<
+  typeof entityClient,
+  "user"
+>;
 ```
 
 A few important points:
@@ -196,21 +199,21 @@ A few important points:
 The manager itself is configured in `src/entity-manager/entityManager.ts`. Here is an excerpt, with commentary:
 
 ```ts
-import type { ConfigInput } from '@karmaniverous/entity-manager';
-import { createEntityManager } from '@karmaniverous/entity-manager';
-import { defaultTranscodes } from '@karmaniverous/entity-tools';
+import type { ConfigInput } from "@karmaniverous/entity-manager";
+import { createEntityManager } from "@karmaniverous/entity-manager";
+import { defaultTranscodes } from "@karmaniverous/entity-tools";
 
-import { errorLogger } from '../util/logger';
-import { emailSchema } from './Email';
-import { userSchema } from './User';
+import { errorLogger } from "../util/logger";
+import { emailSchema } from "./Email";
+import { userSchema } from "./User";
 
 // Use "now" as a sharding breakpoint so historical items are unsharded,
 // while newly-created items demonstrate sharding behavior in tests.
 const now = Date.now();
 
 const config = {
-  hashKey: 'hashKey' as const,
-  rangeKey: 'rangeKey' as const,
+  hashKey: "hashKey" as const,
+  rangeKey: "rangeKey" as const,
 
   // Drive domain shapes from Zod schemas (base fields only).
   entitiesSchema: {
@@ -221,13 +224,13 @@ const config = {
   // Entities and per-entity sharding schedule.
   entities: {
     email: {
-      uniqueProperty: 'email',
-      timestampProperty: 'created',
+      uniqueProperty: "email",
+      timestampProperty: "created",
       shardBumps: [{ timestamp: now, charBits: 2, chars: 1 }],
     },
     user: {
-      uniqueProperty: 'userId',
-      timestampProperty: 'created',
+      uniqueProperty: "userId",
+      timestampProperty: "created",
       shardBumps: [{ timestamp: now, charBits: 2, chars: 1 }],
     },
   },
@@ -235,94 +238,109 @@ const config = {
   // Generated properties power indexes and alternate hash keys.
   generatedProperties: {
     sharded: {
-      beneficiaryHashKey: ['beneficiaryId'] as const,
-      userHashKey: ['userId'] as const,
+      beneficiaryHashKey: ["beneficiaryId"] as const,
+      userHashKey: ["userId"] as const,
     } as const,
     unsharded: {
       firstNameRangeKey: [
-        'firstNameCanonical',
-        'lastNameCanonical',
-        'created',
+        "firstNameCanonical",
+        "lastNameCanonical",
+        "created",
       ] as const,
       lastNameRangeKey: [
-        'lastNameCanonical',
-        'firstNameCanonical',
-        'created',
+        "lastNameCanonical",
+        "firstNameCanonical",
+        "created",
       ] as const,
     } as const,
   } as const,
 
   // Index tokens exactly match those used by the handlers.
   indexes: {
-    created: { hashKey: 'hashKey', rangeKey: 'created', projections: [] },
+    created: {
+      hashKey: "hashKey",
+      rangeKey: "created",
+      projections: [],
+    },
     firstName: {
-      hashKey: 'hashKey',
-      rangeKey: 'firstNameRangeKey',
+      hashKey: "hashKey",
+      rangeKey: "firstNameRangeKey",
       projections: [],
     },
     lastName: {
-      hashKey: 'hashKey',
-      rangeKey: 'lastNameRangeKey',
+      hashKey: "hashKey",
+      rangeKey: "lastNameRangeKey",
       projections: [],
     },
-    phone: { hashKey: 'hashKey', rangeKey: 'phone', projections: [] },
-    updated: { hashKey: 'hashKey', rangeKey: 'updated', projections: [] },
+    phone: {
+      hashKey: "hashKey",
+      rangeKey: "phone",
+      projections: [],
+    },
+    updated: {
+      hashKey: "hashKey",
+      rangeKey: "updated",
+      projections: [],
+    },
     userBeneficiaryCreated: {
-      hashKey: 'beneficiaryHashKey',
-      rangeKey: 'created',
+      hashKey: "beneficiaryHashKey",
+      rangeKey: "created",
       projections: [],
     },
     userBeneficiaryFirstName: {
-      hashKey: 'beneficiaryHashKey',
-      rangeKey: 'firstNameRangeKey',
+      hashKey: "beneficiaryHashKey",
+      rangeKey: "firstNameRangeKey",
       projections: [],
     },
     userBeneficiaryLastName: {
-      hashKey: 'beneficiaryHashKey',
-      rangeKey: 'lastNameRangeKey',
+      hashKey: "beneficiaryHashKey",
+      rangeKey: "lastNameRangeKey",
       projections: [],
     },
     userBeneficiaryPhone: {
-      hashKey: 'beneficiaryHashKey',
-      rangeKey: 'phone',
+      hashKey: "beneficiaryHashKey",
+      rangeKey: "phone",
       projections: [],
     },
     userBeneficiaryUpdated: {
-      hashKey: 'beneficiaryHashKey',
-      rangeKey: 'updated',
+      hashKey: "beneficiaryHashKey",
+      rangeKey: "updated",
       projections: [],
     },
     userCreated: {
-      hashKey: 'userHashKey',
-      rangeKey: 'created',
+      hashKey: "userHashKey",
+      rangeKey: "created",
       projections: [],
     },
   } as const,
 
   // Map domain fields to transcoding strategies for generated tokens.
   propertyTranscodes: {
-    beneficiaryId: 'string',
-    created: 'timestamp',
-    email: 'string',
-    firstNameCanonical: 'string',
-    lastNameCanonical: 'string',
-    phone: 'string',
-    updated: 'timestamp',
-    userId: 'string',
+    beneficiaryId: "string",
+    created: "timestamp",
+    email: "string",
+    firstNameCanonical: "string",
+    lastNameCanonical: "string",
+    phone: "string",
+    updated: "timestamp",
+    userId: "string",
   },
 
   // Keep default transcoding behavior.
   transcodes: defaultTranscodes,
 } satisfies ConfigInput;
 
-export const entityManager = createEntityManager(config, errorLogger);
+export const entityManager = createEntityManager(
+  config,
+  errorLogger
+);
 ```
 
 This values‑first literal preserves tokens such as `hashKey`, `rangeKey`, and index names exactly, so you get strong, token‑aware inference across the stack without generics or casts.
 
 ## `EntityClient` Configuration
 
-{% include figure image_path="https://raw.githubusercontent.com/karmaniverous/entity-manager-demo/main/assets/entityClient.png" caption="_`EntityClient` configuration._" %}
+{% include figure image_path="https://raw.githubusercontent.com/karmaniverous/entity-manager-demo/main/assets/entityClient.png" caption="_`EntityClient` configuration._" popup=true %}
 
 The [`EntityClient`](https://docs.karmanivero.us/entity-client-dynamodb/classes/index.EntityClient.html) class combines the AWS SDK’s DynamoDB client and document layer with a few high‑level helpers (batched writes, table lifecycle, etc.) and a typed query builder.
 
@@ -330,21 +348,21 @@ In this demo we wire it to our manager and point it at DynamoDB Local:
 
 ```ts
 // src/entity-manager/entityClient.ts
-import { EntityClient } from '@karmaniverous/entity-client-dynamodb';
+import { EntityClient } from "@karmaniverous/entity-client-dynamodb";
 
-import { errorLogger } from '../util/logger';
-import { entityManager } from './entityManager';
+import { errorLogger } from "../util/logger";
+import { entityManager } from "./entityManager";
 
 export const entityClient = new EntityClient({
   credentials: {
-    accessKeyId: 'fakeAccessKeyId',
-    secretAccessKey: 'fakeSecretAccessKey',
+    accessKeyId: "fakeAccessKeyId",
+    secretAccessKey: "fakeSecretAccessKey",
   },
-  endpoint: 'http://localhost:8000', // DynamoDB Local
+  endpoint: "http://localhost:8000", // DynamoDB Local
   entityManager, // typed — keeps reads/writes in sync
   logger: errorLogger,
-  region: 'local',
-  tableName: 'UserService',
+  region: "local",
+  tableName: "UserService",
 });
 ```
 
@@ -356,11 +374,11 @@ Two things to notice:
 It’s also common to generate a table definition from the manager for local/dev:
 
 ```ts
-import { generateTableDefinition } from '@karmaniverous/entity-client-dynamodb';
+import { generateTableDefinition } from "@karmaniverous/entity-client-dynamodb";
 
 await entityClient.createTable({
   ...generateTableDefinition(entityClient.entityManager),
-  BillingMode: 'PAY_PER_REQUEST',
+  BillingMode: "PAY_PER_REQUEST",
 });
 ```
 
@@ -388,9 +406,9 @@ Below are small, focused examples with explanations.
 ```ts
 // src/handlers/email/createEmail.ts (excerpt)
 export const createEmail = async (
-  params: CreateEmailParams, // EmailItem with 'created' optional
+  params: CreateEmailParams // EmailItem with 'created' optional
 ): Promise<EmailItem> => {
-  const entityToken = 'email';
+  const entityToken = "email";
 
   // Extract & normalize for uniqueness (case-insensitive)
   const { email, userId, ...rest } = params;
@@ -398,7 +416,7 @@ export const createEmail = async (
 
   // Guard against duplicates — uniqueProperty is 'email'
   if ((await readEmail(normalizedEmail)).length)
-    throw new Error('Email record already exists.');
+    throw new Error("Email record already exists.");
 
   // Create the domain item
   const now = Date.now();
@@ -410,7 +428,10 @@ export const createEmail = async (
   };
 
   // Add generated/global keys and persist
-  const record = entityClient.entityManager.addKeys(entityToken, item);
+  const record = entityClient.entityManager.addKeys(
+    entityToken,
+    item
+  );
   await entityClient.putItem(record);
 
   return item; // return the domain item shape
@@ -428,19 +449,25 @@ Explanation:
 ```ts
 // src/handlers/email/readEmail.ts (excerpt)
 export function readEmail(
-  email: EmailItem['email'],
-  keepKeys: true,
+  email: EmailItem["email"],
+  keepKeys: true
 ): Promise<EmailRecord[]>; // records with keys
 export function readEmail(
-  email: EmailItem['email'],
-  keepKeys?: false,
+  email: EmailItem["email"],
+  keepKeys?: false
 ): Promise<EmailItem[]>; // domain items (keys removed)
-export async function readEmail(email: EmailItem['email'], keepKeys = false) {
-  const entityToken = 'email' as const;
+export async function readEmail(
+  email: EmailItem["email"],
+  keepKeys = false
+) {
+  const entityToken = "email" as const;
 
-  const keys = entityClient.entityManager.getPrimaryKey(entityToken, {
-    email: email.toLowerCase(),
-  });
+  const keys = entityClient.entityManager.getPrimaryKey(
+    entityToken,
+    {
+      email: email.toLowerCase(),
+    }
+  );
 
   const { items } = await entityClient.getItems(entityToken, keys);
   if (keepKeys) return items;
@@ -459,14 +486,19 @@ Explanation:
 
 ```ts
 // src/handlers/email/deleteEmail.ts (excerpt)
-export const deleteEmail = async (email: EmailItem['email']): Promise<void> => {
-  const entityToken = 'email';
+export const deleteEmail = async (
+  email: EmailItem["email"]
+): Promise<void> => {
+  const entityToken = "email";
 
   // Read first → derive exact primary keys → delete
   const items = await readEmail(email, true);
-  if (!items.length) throw new Error('Email records do not exist.');
+  if (!items.length) throw new Error("Email records do not exist.");
 
-  const keys = entityClient.entityManager.getPrimaryKey(entityToken, items);
+  const keys = entityClient.entityManager.getPrimaryKey(
+    entityToken,
+    items
+  );
   await entityClient.deleteItems(keys);
 };
 ```
@@ -480,22 +512,24 @@ Explanation:
 ```ts
 // src/handlers/email/searchEmails.ts (excerpt)
 export const searchEmails = async (params: SearchEmailsParams) => {
-  const { createdFrom, createdTo, pageKeyMap, sortDesc, userId } = params;
-  const entityToken = 'email';
+  const { createdFrom, createdTo, pageKeyMap, sortDesc, userId } =
+    params;
+  const entityToken = "email";
 
   // Hash-key token varies by scope: global vs user-scoped
-  const hashKeyToken = userId ? 'userHashKey' : 'hashKey';
+  const hashKeyToken = userId ? "userHashKey" : "hashKey";
 
   // CF literal narrows index tokens (and page keys) at compile time
   const cf = {
     indexes: {
-      created: { hashKey: 'hashKey', rangeKey: 'created' },
-      userCreated: { hashKey: 'userHashKey', rangeKey: 'created' },
+      created: { hashKey: "hashKey", rangeKey: "created" },
+      userCreated: { hashKey: "userHashKey", rangeKey: "created" },
     },
   } as const;
 
   // Pick the specific index token given the scope
-  const indexToken = hashKeyToken === 'userHashKey' ? 'userCreated' : 'created';
+  const indexToken =
+    hashKeyToken === "userHashKey" ? "userCreated" : "created";
 
   // Compose and execute a cross-shard query
   const result = await createQueryBuilder({
@@ -506,13 +540,13 @@ export const searchEmails = async (params: SearchEmailsParams) => {
     cf,
   })
     .addRangeKeyCondition(indexToken, {
-      property: 'created',
-      operator: 'between',
+      property: "created",
+      operator: "between",
       value: { from: createdFrom, to: createdTo },
     })
     .query({
       item: userId ? { userId } : {},
-      sortOrder: [{ property: 'created', desc: sortDesc }],
+      sortOrder: [{ property: "created", desc: sortDesc }],
       timestampFrom: createdFrom,
       timestampTo: createdTo,
     });
@@ -522,12 +556,12 @@ export const searchEmails = async (params: SearchEmailsParams) => {
   // Enrich items then sort by a domain property
   const keys = entityClient.entityManager.getPrimaryKey(
     entityToken,
-    result.items,
+    result.items
   );
   const { items } = await entityClient.getItems(keys);
   result.items = entityClient.entityManager.removeKeys(
     entityToken,
-    sort(items, [{ property: 'created', desc: sortDesc }]),
+    sort(items, [{ property: "created", desc: sortDesc }])
   );
   return result;
 };
@@ -548,14 +582,14 @@ Explanation:
 ```ts
 // src/handlers/user/createUser.ts (excerpt)
 export const createUser = async (
-  params: CreateUserParams,
+  params: CreateUserParams
 ): Promise<UserItem> => {
-  const entityToken = 'user';
+  const entityToken = "user";
   const { firstName, lastName, userId, ...rest } = params;
 
   // Guard: if a userId is provided and exists, fail fast
   if (userId && (await readUser(userId)).length)
-    throw new Error('Email record already exists.');
+    throw new Error("Email record already exists.");
 
   // Canonicalize to enable normalized search
   const now = Date.now();
@@ -563,15 +597,18 @@ export const createUser = async (
     ...rest,
     created: now,
     firstName,
-    firstNameCanonical: normstr(firstName) ?? '',
+    firstNameCanonical: normstr(firstName) ?? "",
     lastName,
-    lastNameCanonical: normstr(lastName) ?? '',
+    lastNameCanonical: normstr(lastName) ?? "",
     updated: now,
     userId: userId ?? nanoid(),
   };
 
   // Add keys & persist; return domain item
-  const record = entityClient.entityManager.addKeys(entityToken, item);
+  const record = entityClient.entityManager.addKeys(
+    entityToken,
+    item
+  );
   await entityClient.putItem(record);
   return item;
 };
@@ -587,19 +624,25 @@ Explanation:
 ```ts
 // src/handlers/user/readUser.ts (excerpt)
 export function readUser(
-  userId: UserItem['userId'],
-  keepKeys: true,
+  userId: UserItem["userId"],
+  keepKeys: true
 ): Promise<UserRecord[]>; // records with keys
 export function readUser(
-  userId: UserItem['userId'],
-  keepKeys?: false,
+  userId: UserItem["userId"],
+  keepKeys?: false
 ): Promise<UserItem[]>; // domain items (keys removed)
-export async function readUser(userId: UserItem['userId'], keepKeys = false) {
-  const entityToken = 'user' as const;
+export async function readUser(
+  userId: UserItem["userId"],
+  keepKeys = false
+) {
+  const entityToken = "user" as const;
 
-  const keys = entityClient.entityManager.getPrimaryKey(entityToken, {
-    userId,
-  });
+  const keys = entityClient.entityManager.getPrimaryKey(
+    entityToken,
+    {
+      userId,
+    }
+  );
   const { items } = await entityClient.getItems(entityToken, keys);
   if (keepKeys) return items;
 
@@ -616,14 +659,14 @@ Explanation:
 ```ts
 // src/handlers/user/updateUser.ts (excerpt)
 export const updateUser = async (
-  data: MakeUpdatable<UserItem, 'userId'>,
+  data: MakeUpdatable<UserItem, "userId">
 ): Promise<UserItem[]> => {
-  const entityToken = 'user';
+  const entityToken = "user";
 
   // Read domain items to update
   const { firstName, lastName, userId, ...rest } = data;
   const items = await readUser(userId);
-  if (!items.length) throw new Error('User records do not exist.');
+  if (!items.length) throw new Error("User records do not exist.");
 
   // Shallow update semantics: undefined ignored; null assigned (and removed)
   const updatedItems = items.map((item) =>
@@ -634,13 +677,13 @@ export const updateUser = async (
       lastNameCanonical: normstr(lastName),
       updated: Date.now(),
       ...rest,
-    }),
+    })
   );
 
   // Re-materialize keys and persist the records
   const updatedRecords = entityClient.entityManager.addKeys(
     entityToken,
-    updatedItems,
+    updatedItems
   );
   await entityClient.putItems(updatedRecords);
 
@@ -657,14 +700,19 @@ Explanation:
 
 ```ts
 // src/handlers/user/deleteUser.ts (excerpt)
-export const deleteUser = async (userId: UserItem['userId']): Promise<void> => {
-  const entityToken = 'user';
+export const deleteUser = async (
+  userId: UserItem["userId"]
+): Promise<void> => {
+  const entityToken = "user";
 
   // Read first → derive exact primary keys → delete
   const items = await readUser(userId, true);
-  if (!items.length) throw new Error('User records do not exist.');
+  if (!items.length) throw new Error("User records do not exist.");
 
-  const keys = entityClient.entityManager.getPrimaryKey(entityToken, items);
+  const keys = entityClient.entityManager.getPrimaryKey(
+    entityToken,
+    items
+  );
   await entityClient.deleteItems(keys);
 };
 ```
@@ -680,7 +728,7 @@ This is the most interesting flow: multiple scopes (global or beneficiary‑scop
 ```ts
 // src/handlers/user/searchUsers.ts (excerpt)
 export const searchUsers = async (params: SearchUsersParams) => {
-  const entityToken = 'user';
+  const entityToken = "user";
 
   // Normalize user-supplied filters
   const {
@@ -698,69 +746,81 @@ export const searchUsers = async (params: SearchUsersParams) => {
   // Choose a default sort order consistent with supplied filters
   const sortOrder: NonNullable<typeof params.sortOrder> =
     params.sortOrder ??
-    (name ? 'name' : updatedFrom || updatedTo ? 'updated' : 'created');
+    (name
+      ? "name"
+      : updatedFrom || updatedTo
+      ? "updated"
+      : "created");
 
   // Switch between global and beneficiary-scoped hash keys
-  const hashKeyToken = beneficiaryId ? 'beneficiaryHashKey' : 'hashKey';
+  const hashKeyToken = beneficiaryId
+    ? "beneficiaryHashKey"
+    : "hashKey";
 
   // Derive which index range-keys we need given supplied filters
   const rangeKeyTokens = phone
-    ? ['phone']
-    : sortOrder === 'created'
-      ? ['created']
-      : sortOrder === 'name'
-        ? name
-          ? ['firstNameRangeKey', 'lastNameRangeKey']
-          : ['lastNameRangeKey']
-        : ['updated'];
+    ? ["phone"]
+    : sortOrder === "created"
+    ? ["created"]
+    : sortOrder === "name"
+    ? name
+      ? ["firstNameRangeKey", "lastNameRangeKey"]
+      : ["lastNameRangeKey"]
+    : ["updated"];
 
   // CF literal constrains index tokens for typing and narrows page keys
   const cf = {
     indexes: {
-      created: { hashKey: 'hashKey', rangeKey: 'created' },
-      firstName: { hashKey: 'hashKey', rangeKey: 'firstNameRangeKey' },
-      lastName: { hashKey: 'hashKey', rangeKey: 'lastNameRangeKey' },
-      phone: { hashKey: 'hashKey', rangeKey: 'phone' },
-      updated: { hashKey: 'hashKey', rangeKey: 'updated' },
+      created: { hashKey: "hashKey", rangeKey: "created" },
+      firstName: {
+        hashKey: "hashKey",
+        rangeKey: "firstNameRangeKey",
+      },
+      lastName: {
+        hashKey: "hashKey",
+        rangeKey: "lastNameRangeKey",
+      },
+      phone: { hashKey: "hashKey", rangeKey: "phone" },
+      updated: { hashKey: "hashKey", rangeKey: "updated" },
       userBeneficiaryCreated: {
-        hashKey: 'beneficiaryHashKey',
-        rangeKey: 'created',
+        hashKey: "beneficiaryHashKey",
+        rangeKey: "created",
       },
       userBeneficiaryFirstName: {
-        hashKey: 'beneficiaryHashKey',
-        rangeKey: 'firstNameRangeKey',
+        hashKey: "beneficiaryHashKey",
+        rangeKey: "firstNameRangeKey",
       },
       userBeneficiaryLastName: {
-        hashKey: 'beneficiaryHashKey',
-        rangeKey: 'lastNameRangeKey',
+        hashKey: "beneficiaryHashKey",
+        rangeKey: "lastNameRangeKey",
       },
       userBeneficiaryPhone: {
-        hashKey: 'beneficiaryHashKey',
-        rangeKey: 'phone',
+        hashKey: "beneficiaryHashKey",
+        rangeKey: "phone",
       },
       userBeneficiaryUpdated: {
-        hashKey: 'beneficiaryHashKey',
-        rangeKey: 'updated',
+        hashKey: "beneficiaryHashKey",
+        rangeKey: "updated",
       },
-      userCreated: { hashKey: 'userHashKey', rangeKey: 'created' },
+      userCreated: { hashKey: "userHashKey", rangeKey: "created" },
     },
   } as const;
 
   // Route map from (hashKeyToken, rangeKeyToken) → index token
   const route = {
     hashKey: {
-      created: 'created',
-      firstNameRangeKey: 'firstName',
-      lastNameRangeKey: 'lastName',
-      phone: 'phone',
-      updated: 'updated',
+      created: "created",
+      firstNameRangeKey: "firstName",
+      lastNameRangeKey: "lastName",
+      phone: "phone",
+      updated: "updated",
     },
     beneficiaryHashKey: {
-      created: 'userBeneficiaryCreated',
-      firstNameRangeKey: 'userBeneficiaryFirstName',
-      lastNameRangeKey: 'userBeneficiaryLastName',
-      phone: 'userBeneficiaryPhone',
-      updated: 'userBeneficiaryUpdated',
+      created: "userBeneficiaryCreated",
+      firstNameRangeKey: "userBeneficiaryFirstName",
+      lastNameRangeKey: "userBeneficiaryLastName",
+      phone: "userBeneficiaryPhone",
+      updated: "userBeneficiaryUpdated",
     },
   } as const;
 
@@ -776,78 +836,85 @@ export const searchUsers = async (params: SearchUsersParams) => {
   // Add per-index range & filter conditions
   for (const rangeKeyToken of rangeKeyTokens) {
     const indexToken =
-      route[hashKeyToken][rangeKeyToken as keyof (typeof route)['hashKey']];
+      route[hashKeyToken][
+        rangeKeyToken as keyof (typeof route)["hashKey"]
+      ];
 
-    if (rangeKeyToken === 'created')
+    if (rangeKeyToken === "created")
       queryBuilder = queryBuilder.addRangeKeyCondition(indexToken, {
-        property: 'created',
-        operator: 'between',
+        property: "created",
+        operator: "between",
         value: { from: createdFrom, to: createdTo },
       });
-    else if (rangeKeyToken === 'firstNameRangeKey')
+    else if (rangeKeyToken === "firstNameRangeKey")
       queryBuilder = queryBuilder.addRangeKeyCondition(indexToken, {
-        property: 'firstNameRangeKey',
-        operator: 'begins_with',
+        property: "firstNameRangeKey",
+        operator: "begins_with",
         value: entityClient.entityManager.encodeGeneratedProperty(
-          'firstNameRangeKey',
-          { firstNameCanonical: name },
+          "firstNameRangeKey",
+          { firstNameCanonical: name }
         ),
       });
-    else if (rangeKeyToken === 'lastNameRangeKey')
+    else if (rangeKeyToken === "lastNameRangeKey")
       queryBuilder = queryBuilder.addRangeKeyCondition(indexToken, {
-        property: 'lastNameRangeKey',
-        operator: 'begins_with',
+        property: "lastNameRangeKey",
+        operator: "begins_with",
         value: entityClient.entityManager.encodeGeneratedProperty(
-          'lastNameRangeKey',
-          { lastNameCanonical: name },
+          "lastNameRangeKey",
+          { lastNameCanonical: name }
         ),
       });
-    else if (rangeKeyToken === 'phone')
+    else if (rangeKeyToken === "phone")
       queryBuilder = queryBuilder.addRangeKeyCondition(indexToken, {
-        property: 'phone',
-        operator: 'begins_with',
+        property: "phone",
+        operator: "begins_with",
         value: phone,
       });
-    else if (rangeKeyToken === 'updated')
+    else if (rangeKeyToken === "updated")
       queryBuilder = queryBuilder.addRangeKeyCondition(indexToken, {
-        property: 'updated',
-        operator: 'between',
+        property: "updated",
+        operator: "between",
         value: { from: updatedFrom, to: updatedTo },
       });
-    else throw new Error(`Unsupported range key token '${rangeKeyToken}'.`);
+    else
+      throw new Error(
+        `Unsupported range key token '${rangeKeyToken}'.`
+      );
 
     // Filters for dimensions not covered by the range-key choice
-    if ((createdFrom || createdTo) && rangeKeyToken !== 'created')
+    if ((createdFrom || createdTo) && rangeKeyToken !== "created")
       queryBuilder = queryBuilder.addFilterCondition(indexToken, {
-        property: 'created',
-        operator: 'between',
+        property: "created",
+        operator: "between",
         value: { from: createdFrom, to: createdTo },
       });
 
     if (
       name &&
-      !['firstNameRangeKey', 'lastNameRangeKey'].includes(rangeKeyToken)
+      !["firstNameRangeKey", "lastNameRangeKey"].includes(
+        rangeKeyToken
+      )
     )
       queryBuilder = queryBuilder.addFilterCondition(indexToken, {
-        operator: 'or',
+        operator: "or",
         conditions: [
           {
-            property: 'firstNameCanonical',
-            operator: 'begins_with',
+            property: "firstNameCanonical",
+            operator: "begins_with",
             value: name,
           },
           {
-            property: 'lastNameCanonical',
-            operator: 'begins_with',
+            property: "lastNameCanonical",
+            operator: "begins_with",
             value: name,
           },
         ],
       });
 
-    if ((updatedFrom || updatedTo) && rangeKeyToken !== 'updated')
+    if ((updatedFrom || updatedTo) && rangeKeyToken !== "updated")
       queryBuilder = queryBuilder.addFilterCondition(indexToken, {
-        property: 'updated',
-        operator: 'between',
+        property: "updated",
+        operator: "between",
         value: { from: updatedFrom, to: updatedTo },
       });
   }
@@ -864,20 +931,21 @@ export const searchUsers = async (params: SearchUsersParams) => {
   // Enrich and sort on domain properties
   const keys = entityClient.entityManager.getPrimaryKey(
     entityToken,
-    result.items,
+    result.items
   );
   const { items } = await entityClient.getItems(keys);
 
   const sortedItems = sort(items, [
     {
-      property: sortOrder === 'name' ? 'lastNameCanonical' : sortOrder,
+      property:
+        sortOrder === "name" ? "lastNameCanonical" : sortOrder,
       desc: sortDesc,
     },
   ]);
 
   result.items = entityClient.entityManager.removeKeys(
     entityToken,
-    sortedItems,
+    sortedItems
   );
   return result;
 };
@@ -895,18 +963,18 @@ The test suite sets up DynamoDB Local, creates the table from your config, exerc
 
 ```ts
 // src/entity-manager/entityClient.test.ts (excerpt)
-import { ListTablesCommand } from '@aws-sdk/client-dynamodb';
+import { ListTablesCommand } from "@aws-sdk/client-dynamodb";
 import {
   dynamoDbLocalReady,
   setupDynamoDbLocal,
   teardownDynamoDbLocal,
-} from '@karmaniverous/dynamodb-local';
-import { generateTableDefinition } from '@karmaniverous/entity-client-dynamodb';
+} from "@karmaniverous/dynamodb-local";
+import { generateTableDefinition } from "@karmaniverous/entity-client-dynamodb";
 
-import { env } from '../env';
-import { entityClient } from './entityClient';
+import { env } from "../env";
+import { entityClient } from "./entityClient";
 
-describe('entityClient', () => {
+describe("entityClient", () => {
   beforeAll(async () => {
     await setupDynamoDbLocal(env.dynamoDbLocalPort);
     await dynamoDbLocalReady(entityClient.client);
@@ -916,17 +984,23 @@ describe('entityClient', () => {
     await teardownDynamoDbLocal();
   });
 
-  it('creates & deletes user table', async () => {
+  it("creates & deletes user table", async () => {
     await entityClient.createTable({
       ...generateTableDefinition(entityClient.entityManager),
-      BillingMode: 'PAY_PER_REQUEST',
+      BillingMode: "PAY_PER_REQUEST",
     });
 
-    let tables = await entityClient.client.send(new ListTablesCommand());
-    expect(tables.TableNames).to.deep.equal([entityClient.tableName]);
+    let tables = await entityClient.client.send(
+      new ListTablesCommand()
+    );
+    expect(tables.TableNames).to.deep.equal([
+      entityClient.tableName,
+    ]);
 
     await entityClient.deleteTable();
-    tables = await entityClient.client.send(new ListTablesCommand());
+    tables = await entityClient.client.send(
+      new ListTablesCommand()
+    );
     expect(tables.TableNames).to.deep.equal([]);
   });
 });
