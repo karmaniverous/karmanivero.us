@@ -27,9 +27,6 @@ Traditional [Relational Database Management Systems](https://en.wikipedia.org/wi
 
 **Entity Manager** is a type-safe [NPM package](https://npmjs.com/karmaniverous/entity-manager) that supports opinionated schema implementation and high-performance, low-code query on NoSQL database platforms like DynamoDB.
 
-**Entity Manager is still under construction!** I'm wrapping up the Typescript refactor & writing the demo & documentation, so we should be ready for production in a few weeks. Meanwhile, please feel free to [reach out](https://github.com/karmaniverous/entity-manager/discussions/) with any questions or feedback!
-{: .notice--warning}
-
 ## Schema Abstraction
 
 A [database schema](https://en.wikipedia.org/wiki/Database_schema) specifies what kinds of data live in a database, how different data entities are related to one another, and how the data should be indexed for efficient update & query.
@@ -53,6 +50,11 @@ NoSQL databases offer no such intermediate layer. A developer must:
 Changes to schema or index requirements require a structural refactor of this approach, plus migration & transformation of existing data to match the new schema. This is an **expensive and risky** operation on production data.
 
 > **Entity Manager** combines a simple configuration with an opinionated process to realize the developer's high-level schema requirements as low-level data elements.
+
+In practice this is a values‑first, TypeScript‑first flow:
+
+- Author a single config literal (as const) that captures entities, generated properties, indexes, and property transcodes. Optionally provide Zod schemas via `entitiesSchema` to infer domain shapes.
+- Create a manager with `createEntityManager(config, logger?)`. From there, helpers add/remove generated keys and typed queries orchestrate cross‑shard reads.
 
 Since the generation of structured data elements is deterministic and reversible, Entity Manager supports **safe migration of data across schema changes.**
 

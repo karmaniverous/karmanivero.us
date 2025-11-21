@@ -6,7 +6,6 @@ header:
   og_image: /assets/collections/entity-manager/configuration-banner.jpg
   overlay_image: /assets/collections/entity-manager/configuration-banner-half.jpg
   teaser: /assets/collections/entity-manager/configuration-square.jpg
-under_construction: true
 related: true
 tags:
   - aws
@@ -24,9 +23,6 @@ tags:
 **Entity Manager** is a highly generic tool that enables efficient put, get, and query operations across many entity relationships, indexes, and sharded partitions.
 
 **Entity Manager** was designed to operate within the context of AWS [DynamoDB](https://aws.amazon.com/dynamodb/), but should work equally well with any sufficiently similar [NoSQL](https://en.wikipedia.org/wiki/NoSQL) platform.
-
-**This page is under construction!** The Typescript refactor is nearly complete, and I'm busy building the demo & syncing up this documentation. Please check back soon for updates and [drop me a note](https://github.com/karmaniverous/entity-manager/discussions) with any questions or ideas!.
-{: .notice--warning}
 
 To accomplish this, **Entity Manager** needs to know:
 
@@ -54,31 +50,28 @@ A _transcode_ is a pair of functions that convert a property value to and from a
 Transcodes and related mechanisms are actually defined in the [`@karmaniverous/entity-tools`](https://github.com/karmaniverous/entity-tools) package, which is a dependency of both **Entity Manager** and the [`@karmaniverous/mock-db`](https://github.com/karmaniverous/mock-db) package used to test **Entity Manager**. For developer convenience these are re-exported from the [`@karmaniverous/entity-manager`](https://github.com/karmaniverous/entity-manager) package.
 {: .notice--info}
 
-For example, here is the definition of the `timestamp` transcode, one of the default transcodes provided by `entity-tools`:
+In the current, inference‑first model, you author a “registry” of transcoders using a value‑first builder. Here is a minimal example that isolates the `timestamp` transcode:
 
 ```ts
 import { isInt, isString } from 'radash';
+import { defineTranscodes } from '@karmaniverous/entity-tools';
 
-import { type DefaultTranscodeMap, type Transcodes } from `@karmaniverous/entity-manager`;
-
-const defaultTranscodes: Transcodes<DefaultTranscodeMap> = {
-  ..., // other transcodes
-
+// Build a registry by providing encode/decode pairs.
+// The builder enforces compile-time agreement between types.
+export const timestampOnly = defineTranscodes({
   timestamp: {
-    encode: (value) => {
+    encode: (value: number) => {
       if (!isInt(value) || value < 0 || value > 9999999999999)
         throw new Error('invalid timestamp');
-
       return value.toString().padStart(13, '0');
     },
-    decode: (value) => {
+    decode: (value: string) => {
       if (!isString(value) || !/^[0-9]{13}$/.test(value))
         throw new Error('invalid encoded timestamp');
-
       return Number(value);
     },
   },
-};
+} as const);
 ```
 
 [`radash`](https://github.com/sodiray/radash) is a key **Entity Manager** dependency, which provides a set of type-safe utility functions for working with data.
@@ -92,14 +85,11 @@ The purpose of this transcode is to convert a Unix timestamp (which is always a 
 
 ```ts
 import { isNumber, isString } from 'radash';
+import { defineTranscodes } from '@karmaniverous/entity-tools';
 
-import { type DefaultTranscodeMap, type Transcodes } from `@karmaniverous/entity-manager`;
-
-const defaultTranscodes: Transcodes<DefaultTranscodeMap> = {
-  ..., // other transcodes
-
+export const fix6Only = defineTranscodes({
   fix6: {
-    encode: (value) => {
+    encode: (value: number) => {
       if (
         !isNumber(value) ||
         value > Number.MAX_SAFE_INTEGER / 1000000 ||
@@ -108,18 +98,16 @@ const defaultTranscodes: Transcodes<DefaultTranscodeMap> = {
         throw new Error('invalid fix6');
 
       const [prefix, abs] = value < 0 ? ['n', -value] : ['p', value];
-
       return `${prefix}${abs.toFixed(6).padStart(17, '0')}`;
     },
-    decode: (value) => {
+    decode: (value: string) => {
       if (!isString(value) || !/^[np][0-9]{10}\.[0-9]{6}$/.test(value))
         throw new Error('invalid encoded fix6');
 
       return (value.startsWith('n') ? -1 : 1) * Number(value.slice(1));
     },
   },
-  ..., // other transcodes
-};
+} as const);
 ```
 
 `fix6` uses the following techniques to meet transcode requirements:
@@ -130,7 +118,7 @@ const defaultTranscodes: Transcodes<DefaultTranscodeMap> = {
 
 - zero-padding of small values (again to ensure proper alpha sort).
 
-**Entity Manager** offers the following set of default transcodes:
+**Entity Manager** ships with a default registry:
 
 | Transcode   | Description                                      |
 | ----------- | ------------------------------------------------ |
@@ -143,77 +131,53 @@ const defaultTranscodes: Transcodes<DefaultTranscodeMap> = {
 
 [Click here](https://github.com/karmaniverous/entity-tools/blob/main/src/defaultTranscodes.ts) to review these default transcode definitions.
 
-Note that, like the [`defaultTranscodes`](https://github.com/karmaniverous/entity-tools/blob/main/src/defaultTranscodes.ts) object (which defines multiple transcodes), each example transcode object above has a type of [`Transcodes`](https://docs.karmanivero.us/entity-manager/types/entity_manager.Transcodes-1.html). This special type ensures that the defined object...
+> Tip: most applications simply import and use `defaultTranscodes` from `@karmaniverous/entity-tools`. If you add a custom transcoder, you can merge it with the defaults at runtime and pass the combined object into your config.
 
-- has the correct keys (the transcode names), and
+### The `TranscodeRegistry` Type
 
-- defines a correctly-typed `encode` and `decode` function for each key.
+A `TranscodeRegistry` is a type-level mapping from transcode names to the _value types_ they encode/decode. The default registry used by Entity Tools and Entity Manager is exported as `DefaultTranscodeRegistry`.
 
-This is guaranteed by the `Transcodes` type's single type parameter, which is a [`TranscodeMap`](https://docs.karmanivero.us/entity-manager/types/entity_manager.TranscodeMap.html).
-
-### The `TranscodeMap` Type
-
-A `TranscodeMap` is a simple Record type that defines:
-
-- the name of each transcode, and
-
-- the type each transcode encodes into or decodes from a string value.
-
-For example, here is the definition of the [`DefaultTranscodeMap`](https://docs.karmanivero.us/entity-manager/interfaces/entity_manager.DefaultTranscodeMap.html) type, which drives the [`defaultTranscodes`](https://docs.karmanivero.us/entity-tools/variables/entity_tools.defaultTranscodes.html) object:
+When you author a registry with `defineTranscodes(...)`, TypeScript can derive the corresponding registry type for you:
 
 ```ts
-import { type TranscodeMap } from `@karmaniverous/entity-manager`;
+import type {
+  TranscodeRegistryFrom, // derives registry type from a record of transcoders
+  TranscodedType, // extracts the value type for a specific transcode name
+  TranscodeName, // union of valid transcode names for a registry
+} from '@karmaniverous/entity-tools';
+import { defineTranscodes } from '@karmaniverous/entity-tools';
 
-interface DefaultTranscodeMap extends TranscodeMap {
-  bigint20: bigint;
-  boolean: boolean;
-  fix6: number;
-  int: number;
-  string: string;
-  timestamp: number;
-}
+const mySpec = {
+  boolean: {
+    encode: (v: boolean) => (v ? 't' : 'f'),
+    decode: (s: string) => s === 't',
+  },
+} as const;
+
+const myTranscodes = defineTranscodes(mySpec);
+
+type MyRegistry = TranscodeRegistryFrom<typeof mySpec>; // { boolean: boolean }
+type BooleanValue = TranscodedType<MyRegistry, 'boolean'>; // boolean
+type Names = TranscodeName<MyRegistry>; // 'boolean'
 ```
 
-An object of type `Transcodes<DefaultTranscodeMap>` _must_...
-
-- have the same keys as `DefaultTranscodeMap` (these are the transcode names), and
-
-- provide an `encode` function that converts a value of the corresponding type to a string, and
-
-- provide a `decode` function that converts a string to a value of the corresponding type.
-
-If any of these conditions are not met, TypeScript will throw a type error.
-
-If you are only using **Entity Manager**'s default transcodes, you can skip the next section. But if you have reason to define your own transcodes, read on!
+If you are only using **Entity Manager**’s default transcodes, you can skip defining a registry entirely and just set `transcodes: defaultTranscodes` in your config.
 
 ### Custom Transcodes
 
-Let's say you are building a high-precision navigation application.
-
-Latitide & longitide values require three digits to the left of the decimal point, so a 64-bit signed `number` leaves room for 13 digits of decimal precision. You will want to define a custom transcode for this data type. Let's extend the existing transcode naming convention and call this transcode `fix13`.
-
-The first step in defining `fix13` will be to extend `DefaultTranscodeMap`:
-
-```ts
-import { type DefaultTranscodeMap } from `@karmaniverous/entity-manager`;
-
-interface MyTranscodeMap extends DefaultTranscodeMap {
-  fix13: number;
-}
-```
-
-Next, you can define a new transcodes object that includes `fix13`, using the `fix8` transcode definition as a template:
+Let’s say you are building a high-precision navigation application. Latitude & longitude values require three digits to the left of the decimal point, so a 64‑bit signed `number` leaves room for 13 digits of decimal precision. You will want to define a custom transcode for this data type—call it `fix13`.
 
 ```ts
 import { isNumber, isString } from 'radash';
+import {
+  defineTranscodes,
+  defaultTranscodes,
+} from '@karmaniverous/entity-tools';
 
-import { defaultTranscodes, type Transcodes } from `@karmaniverous/entity-manager`;
-
-const myTranscodes: Transcodes<MyTranscodeMap> = {
-  ...defaultTranscodes, // reuse default transcodes
-
+// Define just the custom encoder/decoder
+const fix13Spec = defineTranscodes({
   fix13: {
-    encode: (value) => {
+    encode: (value: number) => {
       if (
         !isNumber(value) ||
         value > Number.MAX_SAFE_INTEGER / 10000000000000 ||
@@ -222,513 +186,327 @@ const myTranscodes: Transcodes<MyTranscodeMap> = {
         throw new Error('invalid fix13');
 
       const [prefix, abs] = value < 0 ? ['n', -value] : ['p', value];
-
       return `${prefix}${abs.toFixed(13).padStart(17, '0')}`;
     },
-    decode: (value) => {
+    decode: (value: string) => {
       if (!isString(value) || !/^[np][0-9]{3}\.[0-9]{13}$/.test(value))
         throw new Error('invalid encoded fix13');
 
       return (value.startsWith('n') ? -1 : 1) * Number(value.slice(1));
     },
   },
-};
+} as const);
+
+// Merge at runtime when passing into the config (simple spread is fine)
+const transcodes = { ...defaultTranscodes, ...fix13Spec };
 ```
 
-## The `Entity` Type
+## The `Entity` Type (concept) and schema-first approach
 
-The [`Entity`](https://docs.karmanivero.us/entity-manager/types/entity_manager.Entity.html) type is a simple Record type that defines the properties of an entity. A type extending the `Entity` type should follow these conventions:
+Historically, the [`Entity`](https://docs.karmanivero.us/entity-manager/types/entity_manager.Entity.html) type described your domain shapes as indexable records, with generated properties marked as `never`. You can still use it conceptually, but **today we recommend a schema‑first approach** using Zod:
 
-- Each key is a property name. All Entity properties should be represented, including generated properties and those with complex types.
+- Define base/domain fields with Zod schemas.
+- Infer your `EmailItem` / `UserItem` types from schemas.
+- Use token‑aware helpers to get storage‑facing “records” when you need them (i.e., including generated/global keys).
 
-- All generated properties should have a type of `never`.
-
-For example, here are the definitions of the `Email` and `User` types discussed in [Evolving a NoSQL Database Schema](/projects/entity-manager/evolving-a-nosql-db-schema/):
+For example, the domain shapes used in the demo:
 
 ```ts
-import { type Entity } from `@karmaniverous/entity-manager`;
+// src/entity-manager/Email.ts
+import type { EntityClientRecordByToken } from '@karmaniverous/entity-manager';
+import { z } from 'zod';
 
-interface Email extends Entity {
-  created: number;
-  email: string;
-  userId: string;
+import { entityClient } from '../entity-manager/entityClient';
 
-  // generated properties
-  userHashKey: never;
-}
+/**
+ * Email domain schema (base fields only).
+ *
+ * Generated/global keys are layered by Entity Manager at runtime. The inferred
+ * EmailItem type represents the domain shape used by handlers. When you read
+ * through the adapter, records will include generated/global keys; strip them
+ * via entityManager.removeKeys('email', record) when you want pure domain
+ * objects for API responses.
+ */
+export const emailSchema = z.object({
+  created: z.number(),
+  email: z.string(),
+  userId: z.string(),
+});
 
-interface User extends Entity {
-  beneficiaryId: string;
-  created: number;
-  firstName: string;
-  firstNameCanonical: string;
-  lastName: string;
-  lastNameCanonical: string;
-  phone?: string;
-  updated: number;
-  userId: string;
+export type EmailItem = z.infer<typeof emailSchema>;
 
-  // generated properties
-  firstNameRangeKey: never;
-  lastNameRangeKey: never;
-  userBeneficiaryHashKey: never;
-  userHashKey: never;
-}
+export type EmailRecord = EntityClientRecordByToken<
+  typeof entityClient,
+  'email'
+>;
 ```
 
-## The `EntityMap` Type
-
-The [`EntityMap`](https://docs.karmanivero.us/entity-tools/types/entity_tools.EntityMap.html) type is a simple Record type that defines the entities in your data model and assigns their respective `Entity` types. An `EntityMap` type should follow these conventions:
-
-- Each key is the token by which an Entity will be referenced throughout your configuration. All entities should be represented.
-
-- Each property type is the corresponding `Entity` type.
-
-For example, the following `MyEntityMap` type would support the User service table discussed in [Evolving a NoSQL Database Schema](/projects/entity-manager/evolving-a-nosql-db-schema/), which includes the `Email` and `User` entities:
-
 ```ts
-import { type EntityMap } from `@karmaniverous/entity-manager`;
+// src/entity-manager/User.ts
+import type { EntityClientRecordByToken } from '@karmaniverous/entity-manager';
+import { z } from 'zod';
 
-interface MyEntityMap extends EntityMap {
-  email: Email;
-  user: User;
-}
+import { entityClient } from '../entity-manager/entityClient';
+
+/**
+ * User domain schema (base fields only).
+ *
+ * This schema excludes all generated/global keys. Those are derived from this
+ * base shape by Entity Manager according to the config. Handlers can rely on
+ * domain types for input/output and only materialize keys when interacting
+ * with the database.
+ */
+export const userSchema = z.object({
+  beneficiaryId: z.string(),
+  created: z.number(),
+  firstName: z.string(),
+  firstNameCanonical: z.string(),
+  lastName: z.string(),
+  lastNameCanonical: z.string(),
+  phone: z.string().optional(),
+  updated: z.number(),
+  userId: z.string(),
+});
+
+export type UserItem = z.infer<typeof userSchema>;
+
+export type UserRecord = EntityClientRecordByToken<typeof entityClient, 'user'>;
 ```
 
-## The Config Type
+If you prefer the original “Entity + EntityMap” mental model, it still maps cleanly to the same configuration and generated tokens; the schema‑first approach just saves you from hand‑maintaining type definitions.
 
-The [`EntityManager`](https://docs.karmanivero.us/entity-manager/classes/index.EntityManager.html) class constructor takes a single argument of the [`Config`](https://docs.karmanivero.us/entity-manager/types/entity_manager.Config.html) type.
+## Values‑first configuration (recommended)
 
-`Config` is a highly complex type, which encapsulates numerous rules whose net effect is to prevent the developer from creating an invalid **Entity Manager** configuration.
+The [`EntityManager`](https://docs.karmanivero.us/entity-manager/classes/index.EntityManager.html) is created by passing a _values‑first_ configuration literal (prefer `as const`) into `createEntityManager(config, logger?)`. This is the simplest path with the strongest inference—no generics at the call site.
 
-This section will cover each element of the `Config` type in depth. First, though, here is an example `Config` object that...
-
-- implements the example summarized at the end of [Evolving a NoSQL Database Schema](/projects/entity-manager/evolving-a-nosql-db-schema/#recap), and
-
-- for clarity, expresses and identifies all default values (normally default values can be omitted).
+Here is a compact example:
 
 ```ts
-import {
-  defaultTranscodes,
-  type Config,
-  type DefaultTranscodeMap
-} from `@karmaniverous/entity-manager`;
+import { createEntityManager } from '@karmaniverous/entity-manager';
+import { defaultTranscodes } from '@karmaniverous/entity-tools';
+import { emailSchema } from './Email';
+import { userSchema } from './User';
 
-const config: Config<
-  MyEntityMap,
-  'hashKey',           // default value
-  'rangeKey',          // default value
-  DefaultTranscodeMap, // default value
-> = {
-  // Common hash & range key properties for all entities. Must
-  // exactly match HashKey & RangeKey type params.
-  hashKey: 'hashKey',            // default value
-  rangeKey: 'rangeKey',          // default value
+const now = Date.now();
 
-  // Delimiters for generated properties & shard keys. Generated
-  // property elements should not contain these characters!
-  generatedKeyDelimiter: '|',    // default value
-  generatedValueDelimiter: '#',  // default value
-  shardKeyDelimiter: '!',        // default value
-
-  // Maximum number of shard queries executed in parallel.
-  throttle: 10,                  // default value
-
-  // Transcode functions for generated properties & page keys.
-  transcodes: defaultTranscodes, // default value
-
-  // Entity-specific configs. Keys must exactly match those of
-  // MyEntityMap.
+const config = {
+  hashKey: 'hashKey' as const,
+  rangeKey: 'rangeKey' as const,
+  entitiesSchema: { email: emailSchema, user: userSchema } as const,
   entities: {
-    // Email entity config.
     email: {
-      // Source property for the Email entity's hash key.
       uniqueProperty: 'email',
-
-      // Source property for timestamp used to calculate Email
-      // shard key.
       timestampProperty: 'created',
-
-      // Default shard bump schedule if not specified. All hash
-      // keys will have a zero-length shard key and be effectively
-      // unsharded.
-      shardBumps: [
-        { charBits: 1, chars: 0, timestamp: 0 },
-      ],
-
-      // Email entity generated properties. These keys must match
-      // the ones with never types in the Email interface defined
-      // above, and are marked with a ⚙️ in the table design.
-      generated: {
-        userHashKey: {
-          // When true, if any element is undefined or null, the
-          // generated property will be undefined. When false,
-          // undefined or null elements will be rendered as an
-          // empty string.
-          atomic: true,
-
-          // Elements of the generated property. These MUST be
-          // ungenerated properties (i.e. not marked with never
-          // in the Email interface) and MUST be included in the
-          // entityTranscodes object below. Elements are applied
-          // in order.
-          elements: ['userId'],
-
-          // When this value is true, the generated property will
-          // be sharded.
-          sharded: true,
-        },
-      },
-
-      // Indexes for the Email entity as specified in the index
-      // design.
-      indexes: {
-        // An index hashKey must be either the global hash key or a
-        // sharded generated property. Its rangeKey must be either
-        // the global range key, an ungenerated scalar property, or
-        // an unsharded generated property. Any ungenerated
-        // properties used MUST be included in the entityTranscodes
-        // object below.
-        created: { hashKey: 'hashKey', rangeKey: 'created' },
-        userCreated: { hashKey: 'userHashKey', rangeKey: 'created' },
-      },
-
-      // Transcodes for ungenerated properties used as generated
-      // property elements or index components. Transcode values
-      // must be valid config transcodes object keys. Since this
-      // config does not define a transcodes object it uses
-      // defaultTranscodes exported by @karmaniverous/entity-tools.
-      elementTranscodes: {
-        created: 'timestamp',
-        userId: 'string',
-      },
+      shardBumps: [{ timestamp: now, charBits: 2, chars: 1 }],
     },
-    // User entity config.
     user: {
       uniqueProperty: 'userId',
       timestampProperty: 'created',
-
-      // User entity's shard bump schedule. Hash keys created
-      // before the timestamp are unsharded (1 possible shard key).
-      // Hash keys created afterward have a 1-char, 2-bit shard key
-      // (4 possible shard keys).
-      shardBumps: [{ timestamp: 1730617827000, charBits: 2, chars: 1 }],
-
-      generated: {
-        firstNameRangeKey: {
-          elements: ['firstNameCanonical', 'lastNameCanonical', 'created'],
-        },
-        lastNameRangeKey: {
-          elements: ['lastNameCanonical', 'firstNameCanonical', 'created'],
-        },
-        userBeneficiaryHashKey: {
-          atomic: true,
-          elements: ['beneficiaryId'],
-          sharded: true,
-        },
-        userHashKey: {
-          atomic: true,
-          elements: ['userId'],
-          sharded: true,
-        },
-      },
-      indexes: {
-        created: { hashKey: 'hashKey', rangeKey: 'created' },
-        firstName: { hashKey: 'hashKey', rangeKey: 'firstNameRangeKey' },
-        lastName: { hashKey: 'hashKey', rangeKey: 'lastNameRangeKey' },
-        phone: { hashKey: 'hashKey', rangeKey: 'phone' },
-        updated: { hashKey: 'hashKey', rangeKey: 'updated' },
-        userBeneficiaryCreated: {
-          hashKey: 'userBeneficiaryHashKey',
-          rangeKey: 'created',
-        },
-        userBeneficiaryFirstName: {
-          hashKey: 'userBeneficiaryHashKey',
-          rangeKey: 'firstNameRangeKey',
-        },
-        userBeneficiaryLastName: {
-          hashKey: 'userBeneficiaryHashKey',
-          rangeKey: 'lastNameRangeKey',
-        },
-        userBeneficiaryPhone: {
-          hashKey: 'userBeneficiaryHashKey',
-          rangeKey: 'phone',
-        },
-        userBeneficiaryUpdated: {
-          hashKey: 'userBeneficiaryHashKey',
-          rangeKey: 'updated',
-        },
-      },
-      elementTranscodes: {
-        beneficiaryId: 'string',
-        created: 'timestamp',
-        firstNameCanonical: 'string',
-        lastNameCanonical: 'string',
-        phone: 'string',
-        updated: 'timestamp',
-        userId: 'string',
-      },
+      shardBumps: [{ timestamp: now, charBits: 2, chars: 1 }],
     },
   },
-};
+  generatedProperties: {
+    sharded: {
+      userHashKey: ['userId'],
+      beneficiaryHashKey: ['beneficiaryId'],
+    } as const,
+    unsharded: {
+      firstNameRangeKey: ['firstNameCanonical', 'lastNameCanonical', 'created'],
+      lastNameRangeKey: ['lastNameCanonical', 'firstNameCanonical', 'created'],
+    } as const,
+  } as const,
+  indexes: {
+    created: { hashKey: 'hashKey', rangeKey: 'created' },
+    // ...other indexes elided for brevity (see demo)
+  } as const,
+  propertyTranscodes: {
+    created: 'timestamp',
+    userId: 'string',
+    email: 'string',
+    // ...rest of mappings
+  },
+  transcodes: defaultTranscodes,
+} as const;
+
+export const entityManager = createEntityManager(config);
 ```
 
-### Type Parameters & Global Keys
+### Type parameters & global keys (background)
 
-Together with its intrinsic shape, the `Config` type's four type parameters work together to determine what constitutes a valid `Config` object.
+For advanced use, Entity Manager exposes generic types that model hash/range keys, generated tokens, and transcodes. With the values‑first approach you don’t need to pass generics—**the compiler derives them directly from your literal**—but the rules remain:
 
-We'll go into some detail about each in the following sections, but here they are in brief:
+- `hashKey` and `rangeKey` in the config are the canonical global key names; they must not collide with any domain property name.
+- Generated and index tokens must be unique and consistent across entities.
+- Transcodes must be provided for every domain property used in a generated token or ungenerated index component.
 
-| Parameter  | Type                                     | Default               | Description                                            |
-| ---------- | ---------------------------------------- | --------------------- | ------------------------------------------------------ |
-| `M`        | [`EntityMap`](#the-entitymap-type)       | -                     | The map of entities in your data model                 |
-| `HashKey`  | `string`                                 | `'hashKey'`           | The hash key property name shared across all entities  |
-| `RangeKey` | `string`                                 | `'rangeKey'`          | The range key property name shared across all entities |
-| `T`        | [`TranscodeMap`](#the-transcodemap-type) | `DefaultTranscodeMap` | The map of transcodes used in your configuration       |
+### Entity configurations
 
-In a simple **Entity Manager** configuration restricted to default transcodes, only the first type parameter is required!
-{: .notice--info}
+The `entities` map defines per‑entity behavior:
 
-The Config object also contains the `hashKey` and `rangeKey` properties, whose values must exactly match those of the `HashKey` and `RangeKey` type parameters, respectively. This is an unavoidable redundancy: while the type parameters help ensure a valid Entity Manager configuration, the corresponding config properties play an important role at runtime.
+- `uniqueProperty` — the field that uniquely identifies records (and anchors the `rangeKey`).
+- `timestampProperty` — the field that anchors shard selection during queries (commonly `created`).
+- `shardBumps` — the planned scale‑up schedule for shard suffix width (more below).
 
-**The property names specified in `hashKey` and `rangeKey` must not conflict with any entity property name in the `M` type parameter.** If they do, TypeScript will throw a type error.
-{: .notice--warning}
+#### Query limits (defaults)
 
-### Entity Configurations
+Entity Manager orchestrates cross‑shard, multi‑index queries under the hood. You can set sensible defaults per entity:
 
-The `entities` property of the `Config` object is a Record-type object whose keys exactly match the keys of the `M` type parameter, i.e. the configuration's `EntityMap`. Missing or extra keys will cause a type error.
+- `defaultPageSize` — target per‑shard page size (default `10`).
+- `defaultLimit` — target overall items per combined result (default `10`).
+- `throttle` — max shard queries in flight (default `10`).
 
-The value associated with each key is the configuration object for that entity. The following sections describe the properties of that object.
-
-#### Query Limits
-
-As described [here](/projects/entity-manager/evolving-a-nosql-db-schema/#cross-shard-querying), a key **Entity Manager** feature is that it simplifies complex, cross-shard, multi-index search operations by automatically decomposing these into a batch of single-shard, single-index queries that are conducted in parallel.
-
-Within this context, `pageSize` indicates the maximum number of items per data page returned by one of these simplified internal queries, and `limit` indicates the minimum paging threshold of the combined result.
-
-Subject to implementation requirements, `pageSize` and `limit` can be set on an individual query. Failing that, their default values for a given entity are set here. If one of these values is _not_ set in the config object, its value defaults to `10`.
-
-`throttle` is the maximum number of queries that can be conducted in parallel. If not set in the config object, its value defaults to `10`.
+Callers can override these in their query options.
 
 #### Indexes
 
-The `indexes` configuration defines the indexes associated with the entity. This configuration serves several purposes:
+Indexes are declared once in the config so:
 
-- Permits dehydration & rehydration of page keys in support of cross-shard, multi-index query operations.
+- The query builder can be typed (index tokens and page keys).
+- Table definition generation can include GSIs for your platform (DynamoDB in our case).
+- Page keys can be dehydrated into a compact, cross‑index string (`pageKeyMap`) and restored later.
 
-- Permits automatic generation of platform-specific data definitions, for example DynamoDB table definitions via the [`generateTableDefinition`](https://docs.karmanivero.us/entity-client-dynamodb/functions/index.generateTableDefinition.html) in the [`entity-client-dynamodb`](https://github.com/karmaniverous/entity-client-dynamodb) package.
+An index must satisfy these rules:
 
-In the future, we will exploit this configuration at the command line to generate platform-specific data definitions, e.g. the CloudFormation specification of a DynamoDB table.
+- `hashKey`: either the global `hashKey` or a **sharded** generated hash token (e.g., `userHashKey`).
+- `rangeKey`: either the global `rangeKey`, an unsharded generated range token, or a transcodable scalar.
+- `projections` (optional): list of projected fields for the index; do not include hash/range keys (global or index).
 
-For now, these indexes are used to specify managed queries and to dehydrate & rehydrate the associated page key maps.
+#### Generated properties
 
-The `indexes` property is an object whose keys are the index names, and whose values are objects with the following properties:
+Each generated property is configured with:
 
-| Property        | Type                                                                                                                            | Description                                                                                                                                                                                         |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `hashKey`       | [`ConfigEntityIndexComponent`](https://docs.karmanivero.us/entity-manager/types/entity_manager.ConfigEntityIndexComponent.html) | The hash key component of the index. Must be either the global hash key or a **sharded** generated property.                                                                                        |
-| `rangeKey`      | [`ConfigEntityIndexComponent`](https://docs.karmanivero.us/entity-manager/types/entity_manager.ConfigEntityIndexComponent.html) | The range key component of the index. Must be either the global range key, a scalar ungenerated property, or an **unsharded** generated property.                                                   |
-| `[projections]` | `string[]`                                                                                                                      | Properties to project from the index, including those not otherwise part of the configuration. May not include the global or index hash or range key. If omitted, all properties will be projected. |
+- `components` (called `elements` in code) — the list of domain fields combined into the token, in order.
+- `atomic` — if `true`, missing component values yield `undefined` rather than empty strings; useful when you need the whole composite present or not at all.
+- `sharded` — whether this token carries a shard suffix (for hash keys).
 
-See [here](/projects/entity-manager/evolving-a-nosql-db-schema/#indexes) for a discussion of special index structure considerations within the DynamoDB context.
+A generated property’s component fields must appear in `propertyTranscodes`.
 
-#### Generated Properties
+#### Element transcodes
 
-The `generated` configuration defines each of an entity's generated properties, which are indicated in the entity's entry in the config's `M` (`EntityMap`) type parameter by a `never` type.
+Every ungenerated property that participates in a generated token or serves as a scalar index range key must have a transcode mapping. Common mappings include `timestamp`, `string`, and `int`.
 
-_All_ such properties must be represented by a key in the `generated` object. If any are missing, or if any extra keys are present, TypeScript will throw a type error.
+#### Sharding strategy
 
-The value associated with each key is a configuration object that defines the generated property's structure. This object has the following properties:
+Sharding is defined declaratively via `shardBumps`:
 
-| Property     | Type       | Default | Description                                                                                                                                                                               |
-| ------------ | ---------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `atomic`     | `boolean`  | `false` | If `true`, any missing component results in an `undefined` generated value. If `false`, missing components are rendered as an empty string.                                               |
-| `components` | `string[]` |         | An array of ungenerated property names that will be used to generate the property. Order matters, and only properties defined in [`Element Transcodes`](#element-transcodes) may be used! |
-| `sharded`    | `boolean`  | `false` | If `true`, the generated property will be sharded. If `false`, it will not.                                                                                                               |
+| Property    | Type     | Description                                              |
+| ----------- | -------- | -------------------------------------------------------- |
+| `timestamp` | `number` | When this bump takes effect (ms since epoch).            |
+| `charBits`  | `number` | Bits per shard character (1..5) — controls radix.        |
+| `chars`     | `number` | Characters in the shard suffix (0..40) — controls width. |
 
-#### Element Transcodes
+- If no bumps are specified, the effective default is a single unsharded partition (`chars: 0`).
+- If you specify only future bumps, historical data remains unsharded; new data becomes sharded as of the bump timestamp.
+- Queries that span bump windows will fan out to the relevant shard space for the window.
 
-The `elementTranscodes` configuration determines:
-
-- which of an entity's properties can be used as an element of an index or a generated property, and
-
-- which transcode should be used to encode that property from its native type to a string, and decode it from a string back to its native type.
-
-The `elementTranscodes` property is a Record-type object whose keys are each a property name of the entity, and whose values are the transcode to be associated with that property. It must follow these rules:
-
-- Each key must be a property name of the entity.
-
-- The entity property type of a given key (as expressed in the config's `M` type parameter) must match the transcode type of the corresponding value (as expressed in the config's `T` type parameter).
-
-In other words, every `elementTranscodes` property must NOT be a [generated property](#generated-properties), and either...
-
-- An element of a [generated property](#generated-properties), or
-
-- An index component.
-
-In practice, the best way to determine which properties should be included in `elementTranscodes` is to create your generated properties & indexes first. Your `elementTranscodes` will be:
-
-- All [generated property](#generated-properties) components, and
-
-- All _ungenerated_ index components.
-
-These rules will be validated at runtime when you parse your configuration object. See [above](#the-config-type) for examples.
-
-#### Sharding Strategy
-
-This configuration defines the sharding strategy for the entity. See [here](/projects/entity-manager/evolving-a-nosql-db-schema/#shard-keys) for an introduction to the rationale behind sharding and structure of a shard key.
-
-Every record created by **Entity Manager** will have a shard key embedded in its hash key. By default, this shard key is an empty string, resulting in a single data partition across the entity.
-
-A record's shard key is assigned at the time of record creation and does not change for the life of the record. Its value is determined by the following entity configurations:
-
-- `shardBumps` is an array of objects that defines a sharding schedule: how the number of partition shards scales over time.
-
-- `timestampProperty` is the name of the entity property that will be used to determine which specific shard bump applies to a given record. This in turn determines the number of available shards at that point in time and the length of the shard key. The record's creation timestamp is the best choice for this property.
-
-- `uniqueProperty` is the name of the entity property that will be hashed in order to determine the shard key for the record. It should be the record's unique identifier.
-
-The entity properties named in `timestampProperty` and `uniqueProperty` should be populated on all records for all entities represented by the configuration.
-
-A shardBump object has the following properties:
-
-| Property    | Type     | Description                                          |
-| ----------- | -------- | ---------------------------------------------------- |
-| `charBits`  | `number` | The number of bits to use for the shard key.         |
-| `chars`     | `number` | The number of characters to use for the shard key.   |
-| `timestamp` | `number` | The timestamp at which this shard bump takes effect. |
-
-If no `shardBumps` are defined for an entity, its shardBumps property will default to the following value:
-
-```ts
-[{ charBits: 1, chars: 0, timestamp: 0 }];
-```
-
-The effect of this is an empty shard key and a single data partition for all records.
-
-If `shardBumps` are defined but contains no record with a zero `timestamp` value, the above value will be prepended to the array. In any case, the array will be sorted by `timestamp` value on parsing.
-
-`shardBumps` must obey the following rules:
-
-- `chars` must be a non-negative integer valued from `0` to `40` inclusive. Its value must increase monotonically with `timestamp`.
-
-- `charBits` must be an integer valued from `1` to `5` inclusive.
-
-- `timestamp` must be a non-negative integer, and duplicate `timestamp` values are not allowed.
-
-For any `shardBump`, the number of available shards is given by `chars * (2 ** charBits)`. At the outer limit, this works out to 26,241 shards across all time, or a total of over 656 million records even at the maximum DynamoDB record size of 400 KB. Most implementations should _not_ approach this limit, as querying this many shards in parallel is bound to impact performance, but it should be plain that the design is scalable enough for any application.
-
-Queries that include a date range may cross `shardBump` boundaries, in which case all relevant shards will be searched. The default case is _no_ timestamp constraint, meaning that all shards up to and including the current `shardBump` will be searched.
-
-This design permits a staged scaling strategy. When the number of records for a given entity is low, it makes sense to have only one shard. As the number of records increases, the number of shards can be increased in a controlled manner.
-
-So long as a new `shardBump` is only added with a _future_ timestamp, your sharding strategy can be scaled gracefully, with no interruptions and without any need to migrate data following shard bumps.
+This staged approach lets you scale up gracefully without re‑keying historical data.
 
 ### Delimiters
 
-The Entity Manager config defines the following special characters as delimiters, to be used when composing generated property values, including the global `hashKey` and `rangeKey`:
+Generated value serialization uses three delimiters:
 
-| Property                  | Type     | Default | Description                                                            |
-| ------------------------- | -------- | ------- | ---------------------------------------------------------------------- |
-| `generatedKeyDelimiter`   | `string` | `'│'`   | Separates key-value pairs in a generated property.                     |
-| `generatedValueDelimiter` | `string` | `'#'`   | Separates key from value in a generated property key-value pair.       |
-| `shardKeyDelimiter`       | `string` | `'!'`   | Separates entity token from shard key in a sharded generated property. |
+| Property                  | Default | Description                                                            |
+| ------------------------- | ------- | ---------------------------------------------------------------------- | -------------------------------------------------- |
+| `generatedKeyDelimiter`   | `'      | '`                                                                     | Separates key-value pairs in a generated property. |
+| `generatedValueDelimiter` | `'#'`   | Separates key from value in a generated property key-value pair.       |
+| `shardKeyDelimiter`       | `'!'`   | Separates entity token from shard key in a sharded generated property. |
 
-**An entity property used as a generated property element or an index component should _never_ contain any of these delimiter characters!** If this is unavoidable, use these configurations to define an alternate delimiter that will not collide with your entity data.
+**An entity property used as a generated property element or an index component should _never_ contain these delimiter characters!** If unavoidable, override the delimiters to characters that never appear in your data.
 {: .notice--warning}
 
-### Config Transcodes
+### Config transcodes
 
-The `transcodes` configuration property has a type of `Transcodes<T>`, where `T` is the `TranscodeMap` type parameter of the `Config` type.
+Set `transcodes` to a registry of encoders/decoders. Most applications use `defaultTranscodes`. If you extend, ensure the value types and keys agree; TypeScript will enforce this when you use `defineTranscodes`.
 
-By default, `T` is `DefaultTranscodeMap` and `transcodes` is `defaultTranscodes`. See [Custom Transcodes](#custom-transcodes) to learn how to define custom transcodes for your configuration.
+### Runtime validation
 
-**`T` and the `transcodes` property must be compatible or Typescript will throw a type error!** In general this means that if you customize one, you must customize the other. The exception is that you are free to override existing default transcodes so long as you maintain the existing type signatures.
-{: .notice--warning}
+TypeScript enforces structure at compile time, but some checks must occur at runtime (e.g., shard‑bump ordering and monotonic `chars`, delimiter collisions). Entity Manager validates your configuration with [`zod`](https://zod.dev/) when you call `createEntityManager(...)`. Invalid configurations throw with a helpful error.
 
-### Runtime Validation
+## Domain and record types (what you read/write)
 
-Typescript will enforce the structure of your `Config` object at compile time. This will largely keep you out of trouble, but there are some validity checks than can _only_ be performed at runtime (e.g. validating that an entity's `shardBumps.chars` value increases monotonically with `timestamp`).
+With the schema‑first approach:
 
-Also, some developers will choose to write their code in Javascript and will not be able to leverage compile-time validation at all.
+- `EmailItem` / `UserItem` (domain) are inferred from your Zod schemas.
+- Storage “records” (with generated/global keys) can be typed via `EntityClientRecordByToken<typeof entityClient, 'token'>`.
 
-To satisfy both of these cases, the `EntityManager` constructor leverages [`zod`](https://zod.dev/) to validate the `Config` object at runtime. If the object is invalid, the constructor will throw an error with a detailed message explaining the problem.
-
-## The `ItemMap` Type
-
-The [`Entity`](#the-entity-type) and [`EntityMap`](#the-entitymap-type) types described above effectively help you define the structure of your data model.
-
-Unfortunately, your `Entity` types are not suitable for representing actual data objects in your application because:
-
-- they use the convention of identifying generated properties with a `never` type, and
-
-- they do _not_ include the `hashKey` and `rangeKey` properties identified elsewhere in your config.
-
-The [`ItemMap`](https://docs.karmanivero.us/entity-manager/types/entity_manager.ItemMap.html) type takes the same type arguments as your `Config` object (except for the final `TranscodeMap` argument, which is not relevant), and returns a type that looks just like your `EntityMap` except that:
-
-- all generated properties initially typed as `never` are replaced with `string` types, and
-
-- `string`-valued hash and range key properties are added with names specified in the `HashKey` and `RangeKey` type parameters, respectively.
-
-Here is an example of how to exploit the `ItemMap` type within the context of the `MyEntityMap` type defined [above](#the-entitymap-type):
+Demo excerpts:
 
 ```ts
-type MyItemMap = ItemMap<MyEntityMap, "hashKey", "rangeKey">;
+// Domain items from Zod
+export type EmailItem = z.infer<typeof emailSchema>;
+export type UserItem = z.infer<typeof userSchema>;
 
-type EmailItem = MyItemMap["email"];
-// {
-//   created: number;
-//   email: string;
-//   userId: string;
-//   hashKey: string;
-//   rangeKey: string;
-//   userHashKey: string;
-// }
-
-type UserItem = MyItemMap["user"];
-// {
-//   beneficiaryId: string;
-//   created: number;
-//   firstName: string;
-//   firstNameCanonical: string;
-//   lastName: string;
-//   lastNameCanonical: string;
-//   phone?: string;
-//   updated: number;
-//   userId: string;
-//   firstNameRangeKey: string;
-//   hashKey: string;
-//   lastNameRangeKey: string;
-//   rangeKey: string;
-//   userBeneficiaryHashKey: string;
-//   userHashKey: string;
-// }
+// Records (storage-facing shapes with keys)
+export type EmailRecord = EntityClientRecordByToken<
+  typeof entityClient,
+  'email'
+>;
+export type UserRecord = EntityClientRecordByToken<typeof entityClient, 'user'>;
 ```
+
+Handlers typically:
+
+- Accept domain items as input.
+- Use `entityManager.addKeys('token', item)` to materialize records for writes.
+- Use token‑aware reads, then `entityManager.removeKeys('token', records)` to return domain items to callers.
+
+> Legacy note: older versions exposed an `ItemMap` utility that transformed a hand-authored `EntityMap` into storage “items”. You can still think in those terms, but the schema‑first approach saves boilerplate and tends to produce better inference.
 
 ## Javascript
 
 If you are working in Javascript, you can still use **Entity Manager**! Just be aware that you will not benefit from the compile-time validation that Typescript provides.
 
-When defining [custom transcodes](#custom-transcodes), you will do so without reference to types, so the example above would look like this:
+When defining [custom transcodes](#custom-transcodes), you will do so without reference to types:
 
 ```js
-import { defaultTranscodes } from `@karmaniverous/entity-manager`;
+import {
+  defineTranscodes,
+  defaultTranscodes,
+} from '@karmaniverous/entity-tools';
 
-const myTranscodes = {
-  ...defaultTranscodes, // reuse default transcodes
+const fix13Spec = defineTranscodes({
+  fix13: {
+    encode: (value) => {
+      /* ... */
+    },
+    decode: (value) => {
+      /* ... */
+    },
+  },
+});
 
-  fix13: { /* same as above */ },
+const transcodes = { ...defaultTranscodes, ...fix13Spec };
+```
+
+Your configuration object is authored as a values‑first literal. You then pass it to the factory:
+
+```js
+import { createEntityManager } from '@karmaniverous/entity-manager';
+
+const config = {
+  hashKey: 'hashKey',
+  rangeKey: 'rangeKey',
+  // entitiesSchema may be omitted in JS; runtime validation still applies
+  entities: {
+    email: { uniqueProperty: 'email', timestampProperty: 'created' },
+    user: { uniqueProperty: 'userId', timestampProperty: 'created' },
+  },
+  generatedProperties: {
+    sharded: { userHashKey: ['userId'] },
+    unsharded: {
+      /* ... */
+    },
+  },
+  indexes: { created: { hashKey: 'hashKey', rangeKey: 'created' } },
+  propertyTranscodes: {
+    created: 'timestamp',
+    userId: 'string',
+    email: 'string',
+  },
+  transcodes,
 };
+
+const entityManager = createEntityManager(config);
 ```
 
-Your [configuration object](#the-config-type) will also be identical to the Typescript version, but without the type annotations:
-
-```js
-import { defaultTranscodes } from `@karmaniverous/entity-manager`;
-
-const config = { /* same as above */ };
-```
-
-The [`EntityManager` constructor](https://docs.karmanivero.us/entity-manager/classes/index.EntityManager.html#constructor) will still validate your configuration at runtime, so you can be confident that it is correct before proceeding.
-
-Having said that: if you are working in Javascript, you should _really_ consider switching to Typescript! The benefits are enormous, and the learning curve is not as steep as you might think.
+The factory will validate your configuration at runtime, so you can be confident that it is correct before proceeding. Having said that: if you are working in Javascript, you should _really_ consider switching to Typescript! The benefits are enormous, and the learning curve is not as steep as you might think.

@@ -1,12 +1,11 @@
 ---
-title: "Entity Manager: A Demonstration"
+title: 'Entity Manager: A Demonstration'
 excerpt: Presenting a step-by-step Typescript implementation of a realistic data model against DynamoDB, with the help of Entity Manager.
 permalink: /projects/entity-manager/demo/
 header:
   og_image: /assets/collections/entity-manager/configuration-banner.jpg
   overlay_image: /assets/collections/entity-manager/configuration-banner-half.jpg
   teaser: /assets/collections/entity-manager/configuration-square.jpg
-under_construction: true
 related: true
 tags:
   - aws
@@ -27,9 +26,6 @@ Your project's data needs are complex. **Entity Manager** simplifies the problem
 At the end of the day, though, you have to implement a _specific_ data model against a _specific_ database platform. This guide presents a step-by-step Typescript implementation of a realistic data model against [DynamoDB](https://aws.amazon.com/dynamodb/), with the help of **Entity Manager**.
 
 The [`entity-manager-demo`](https://github.com/karmaniverous/entity-manager-demo) repository contains the full implementation documented below.
-
-**This page is under construction!** The Typescript refactor is nearly complete, and I'm busy building the demo & syncing up this documentation. Please check back soon for updates and [drop me a note](https://github.com/karmaniverous/entity-manager/discussions) with any questions or ideas!.
-{: .notice--warning}
 
 ## An Overview
 
@@ -56,12 +52,7 @@ The details of an API implementation are beyond the scope of this demo, but we w
 
 We'll also demonstrate how to leverage your **Entity Manager** config to generate a definition for your DynamoDB table, and how to use the [`entity-client-dynamodb`](https://github.com/karmaniverous/entity-client-dynamodb) to create this table and efficiently perform other table-level database operations in DynamoDB.
 
-We'll write [`mocha`](https://mochajs.org)/[`chai`](https://www.chaijs.com/) unit tests to exercise all this functionality against DynamoDB using the [DynamoDB Local](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html) emulator running in a Docker container. This will allow you to run the demo on your local machine without incurring any AWS costs (though these would be trivial) and without requiring an active connection to AWS.
-
-You should be abe to pull the repository, install dependencies, and run all unit tests successfully within just a few minutes. **So let's get started!**
-
-For convenience, this repository uses my [Typescript NPM Package Template](https://github.com/karmaniverous/npm-package-template-ts), only I've stripped out the CLI & [Rollup](https://rollupjs.org/) build and have disabled NPM publishing. So what remains is a pure, [semantic-versioned](https://semver.org/) Typescript "package" with a bunch of unit tests: perfect for a demo that can evolve over time, useless for anything else.
-{: .notice--info}
+We use [Vitest](https://vitest.dev/) for the test suite and run against [DynamoDB Local](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html) in a Docker container. This lets you run everything locally without touching AWS (and without costs).
 
 ## DynamoDB Local Integration
 
@@ -80,11 +71,17 @@ After you have Docker Desktop installed & running, follow these steps:
 
 1. Clone the [`entity-manager-demo`](https://github.com/karmaniverous/entity-manager-demo) repository to your local machine.
 
-1. Install dependencies by running `npm install` from the repository root.
+2. Install dependencies by running `npm install` from the repository root.
 
-1. Optionally, install [Mocha Test Explorer](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-mocha-test-adapter) to make it a bit easier to follow along with the examples below.
+3. Optionally, install the [Vitest Explorer](https://marketplace.visualstudio.com/items?itemName=ZixuanChen.vitest-explorer) VS Code extension if you prefer a GUI for tests.
 
-That's it! Check your work by running `npm test` from the repository root. If all the tests pass, you're ready to start exploring the code!
+That's it! Check your work by running:
+
+```bash
+npm test
+```
+
+If all the tests pass, you're ready to start exploring the code!
 
 **If you run into any trouble**, please [start a discussion](https://github.com/karmaniverous/entity-manager-demo/discussions) and I'll help!
 {: .notice--info}
@@ -101,391 +98,286 @@ All packages in the **Entity Manager** ecosystem perform extensive debug logging
 
 - Use the `controlledProxy` function to proxy the `logger` object and disable the `debug` endpoint. When we inject the resulting `errorLogger` object into our `EntityManager` and `Entity Client` instances, all of their internal debug logging will be suppressed.
 
-Visit [`logger.ts`](https://github.com/karmaniverous/entity-manager-demo/blob/main/src/logger.ts) to see this code in context.
+Visit [`src/util/logger.ts`](https://github.com/karmaniverous/entity-manager-demo/blob/main/src/util/logger.ts) to see this code in context.
 
 ```ts
-import { controlledProxy } from "@karmaniverous/controlled-proxy";
+import { controlledProxy } from '@karmaniverous/controlled-proxy';
 
-// Use the console logger. This could easily be replaced with a
-// custom logger like winston.
+/**
+ * Minimal logger wiring for the demo.
+ *
+ * We use console by default for simplicity. You can swap this for
+ * your favorite structured logger (e.g., pino, winston) without
+ * touching the rest of the codebase.
+ */
 export const logger = console;
 
-// Proxy the logger & disable debug logging.
+/**
+ * Proxy console to suppress "debug" logs from the Entity* stack while
+ * keeping "error" visible. This keeps test output and examples quiet.
+ *
+ * Flip debug back on by changing defaultControls.debug to true.
+ */
 export const errorLogger = controlledProxy({
   defaultControls: { debug: false },
   target: logger,
 });
 ```
 
+The proxy keeps library-level debug logs quiet while preserving your own logs and all errors—ideal for readable demo output and CI logs.
+
 ## `EntityManager` Configuration
 
 {% include figure image_path="https://raw.githubusercontent.com/karmaniverous/entity-manager-demo/main/assets/entityManager.png" caption="_`EntityManager` configuration._" %}
 
-**Entity Manager** configuration is a complex topic! Our purpose here is to focus specifically on our demonstration scenario. [Click here](/projects/entity-manager/configuration/) for a deeper dive into all aspects of **Entity Manager** configuration.
+**Entity Manager** is now a values‑first + schema‑first tool:
 
-**Entity Manager is a Typescript-first tool!** If you are writing Javascript, you can skip the type-related parts of this guide and your config will still be validated for you at run time. You just won't get the compile-time type checking that Typescript provides.
-{: .notice--warning}
+- Author a single config literal (`as const`) that captures your token names, generated properties, indexes, and transcodes.
+- Optionally include Zod schemas for your entities via `entitiesSchema` (base/domain fields only).
+- Call `createEntityManager(config, logger?)`. The manager infers types from values (and schemas) and validates the configuration at runtime.
 
-The [`EntityManager`](https://docs.karmanivero.us/entity-manager/classes/index.EntityManager.html) class configuration object is defined in the [`Config`](https://docs.karmanivero.us/entity-manager/types/entity_manager.Config.html) type. Internally this type is _very_ complex, in order to support all kinds of compile-time validations. Once the config is parsed, though, it takes on the [`ParsedConfig`](https://docs.karmanivero.us/entity-manager/types/entity_manager.ParsedConfig.html) type, **which has the same form and is quite a bit easier to read!**
-
-Creating an `EntityManager` instance is really about creating a valid `Config` object.
-
-The `Config` type has four type parameters. Only the first one is required, and for this demo we will use defaults for the other three. Here they are:
-
-- `M extends`[`EntityMap`](/projects/entity-manager/configuration/#the-entitymap-type) - This is the most important parameter and will be different in every implementation. We'll address it below.
-
-- `HashKey extends string` - This is the name of the generated hash key property that will be shared across all entities in the configuration. The default value is `'hashKey'`, and we will use that here.
-
-- `RangeKey extends string` - This is the name of the generated range key property that will be shared across all entities in the configuration. The default value is `'rangeKey'`, and we will use that here.
-
-- `T extends`[`TranscodeMap`](/projects/entity-manager/configuration/#the-transcodemap-type) - Relates the name of a [transcode](/projects/entity-manager/configuration/#transcodes) to the type of the value being transcoded. This parameter defaults to an extensible [DefaultTranscodeMap](https://docs.karmanivero.us/entity-tools/interfaces/entity_tools.DefaultTranscodeMap.html) type that will serve our purposes here.
-
-The `EntityManager` constructor also takes a `logger` argument. To minimize noise in the demo console, the injected `errorLogger` proxies `console` to disable debug logging in the `EntityManager` instance while keeping it enabled elsewhere. See my [`controlled-proxy`](https://github.com/karmaniverous/controlled-proxy) repo for more info!
-
-Let's compose our configuration's `EntityMap`.
-
-### `MyEntityMap` Type
-
-An [`EntityMap`](http://localhost:4000/projects/entity-manager/configuration/#the-entitymap-type) is just a map of Typescript interfaces that define the structure of each entity in the configuration. The keys of the map are the entity names, and the values are the entity interfaces.
-
-As a special convention, within each interface we identify _generated properties_ (the ones marked with a ⚙️ in our [table design](/projects/entity-manager/evolving-a-nosql-db-schema/#table-properties)) with a `never` type. This is a signal to the `Config` type that these properties require special support & configuration. See the `EmailEntity` and `UserEntity` interfaces below for examples.
-
-While we are at it, we will also construct and export the `Email` and `User` types. These are the same as `EmailEntity` and `UserEntity`, respectively, but we've stripped out all properties with the `never` type. These are useful for the rest of our application code, which doesn't need to know about properties that are specific to data operations.
-
-Here is the definition of `MyEntityMap` from [`entityManager.ts`](https://github.com/karmaniverous/entity-manager-demo/blob/main/src/entityManager.ts):
+In this demo, Email and User schemas live alongside their types:
 
 ```ts
-import type { EntityMap } from "@karmaniverous/entity-manager";
-import type {
-  Entity,
-  PropertiesNotOfType,
-} from "@karmaniverous/entity-tools";
+// src/entity-manager/Email.ts
+import type { EntityClientRecordByToken } from '@karmaniverous/entity-manager';
+import { z } from 'zod';
 
-// Email entity interface. never types indicate generated properties.
-interface EmailEntity extends Entity {
-  created: number;
-  email: string;
-  userHashKey: never; // generated
-  userId: string;
-}
+import { entityClient } from '../entity-manager/entityClient';
 
-// Email type for use outside data operations.
-export type Email = Pick<
-  EmailEntity,
-  PropertiesNotOfType<EmailEntity, never>
+/**
+ * Email domain schema (base fields only).
+ */
+export const emailSchema = z.object({
+  created: z.number(),
+  email: z.string(),
+  userId: z.string(),
+});
+
+export type EmailItem = z.infer<typeof emailSchema>;
+export type EmailRecord = EntityClientRecordByToken<
+  typeof entityClient,
+  'email'
 >;
-
-// User entity interface. never types indicate generated properties.
-interface UserEntity extends Entity {
-  beneficiaryId: string;
-  created: number;
-  firstName: string;
-  firstNameCanonical: string;
-  firstNameRangeKey: never; // generated
-  lastName: string;
-  lastNameCanonical: string;
-  lastNameRangeKey: never; // generated
-  phone?: string;
-  updated: number;
-  userBeneficiaryHashKey: never; // generated
-  userHashKey: never; // generated
-  userId: string;
-}
-
-// Email type for use outside data operations.
-export type User = Pick<
-  UserEntity,
-  PropertiesNotOfType<UserEntity, never>
->;
-
-// Entity interfaces combined into EntityMap.
-interface MyEntityMap extends EntityMap {
-  email: EmailEntity;
-  user: UserEntity;
-}
 ```
 
-### `config` Object
+```ts
+// src/entity-manager/User.ts
+import type { EntityClientRecordByToken } from '@karmaniverous/entity-manager';
+import { z } from 'zod';
 
-The `config` object has a lot of moving parts, so it helps to come at the problem from a specific direction.
+import { entityClient } from '../entity-manager/entityClient';
 
-The properties of the demo config object defined below are arranged accordingly and explained in the comments. For the mopart, only the Email entity config is commented, since the User config follows the same pattern.
+/**
+ * User domain schema (base fields only).
+ */
+export const userSchema = z.object({
+  beneficiaryId: z.string(),
+  created: z.number(),
+  firstName: z.string(),
+  firstNameCanonical: z.string(),
+  lastName: z.string(),
+  lastNameCanonical: z.string(),
+  phone: z.string().optional(),
+  updated: z.number(),
+  userId: z.string(),
+});
 
-Here are some important references from the comments:
+export type UserItem = z.infer<typeof userSchema>;
+export type UserRecord = EntityClientRecordByToken<typeof entityClient, 'user'>;
+```
 
-- The demo [table design](/projects/entity-manager/evolving-a-nosql-db-schema/#table-properties).
+A few important points:
 
-- The demo [index design](http://localhost:4000/projects/entity-manager/evolving-a-nosql-db-schema/#indexes).
+- Schemas declare only domain fields. Generated/global keys (e.g., `hashKey`, `rangeKey`, or range-key composites) are layered by Entity Manager based on the config.
+- `EmailItem` and `UserItem` are the shapes your API handlers work with.
+- When you read through the adapter you’ll get “records” (storage-facing shapes that include keys). Use `entityManager.removeKeys()` when you want to return pure domain items to callers.
 
-- [Transcodes](/projects/entity-manager/configuration/#transcodes) perform and reverse the conversion of a value into a string, often at a fixed width, for inclusion in a generated property while preserving its sorting characteristics. The [`defaultTranscodes`](https://github.com/karmaniverous/entity-tools/blob/main/src/defaultTranscodes.ts) object is used here since a `transcodes` object is not defined in the config. Available transcodes are:
-  - `bigint` - Renders a `bigint` as a variable-width string.
-  - `bigint20` - Pads a `bigint` to a fixed width of 20 characters.
-  - `boolean` - Renders as `'t'` or `'f'`.
-  - `fix6` - Pads a number to a fixed width with 6 decimal digits.
-  - `int` - Pads a signed integer to a fixed width.
-  - `number` - Renders a `number` as a variable-width string.
-  - `string` - Variable-length pass-through.
-  - `timestamp` - Pads a UNIX ms timestamp to a fixed width.
-
-Visit [`entityManager.ts`](https://github.com/karmaniverous/entity-manager-demo/blob/main/src/entityManager.ts) to see this code in context.
+The manager itself is configured in `src/entity-manager/entityManager.ts`. Here is an excerpt, with commentary:
 
 ```ts
-import {
-  type Config,
-  EntityManager,
-} from "@karmaniverous/entity-manager";
+import type { ConfigInput } from '@karmaniverous/entity-manager';
+import { createEntityManager } from '@karmaniverous/entity-manager';
+import { defaultTranscodes } from '@karmaniverous/entity-tools';
 
-import { errorLogger } from "./logger";
+import { errorLogger } from '../util/logger';
+import { emailSchema } from './Email';
+import { userSchema } from './User';
 
-// Current timestamp will act as break point for sharding schedule.
+// Use "now" as a sharding breakpoint so historical items are unsharded,
+// while newly-created items demonstrate sharding behavior in tests.
 const now = Date.now();
 
-// Config object for EntityManager.
-// Using default values for HashKey, RangeKey, and TranscodeMap
-// type params.
-const config: Config<MyEntityMap> = {
-  // Common hash & range key properties for all entities. Must
-  // exactly match HashKey & RangeKey type params.
-  hashKey: "hashKey",
-  rangeKey: "rangeKey",
+const config = {
+  hashKey: 'hashKey' as const,
+  rangeKey: 'rangeKey' as const,
 
-  // Entity-specific configs. Keys must exactly match those of
-  // MyEntityMap.
+  // Drive domain shapes from Zod schemas (base fields only).
+  entitiesSchema: {
+    email: emailSchema,
+    user: userSchema,
+  } as const,
+
+  // Entities and per-entity sharding schedule.
   entities: {
-    // Email entity config.
     email: {
-      // Source property for the Email entity's hash key.
-      uniqueProperty: "email",
-
-      // Source property for timestamp used to calculate Email
-      // shard key.
-      timestampProperty: "created",
-
-      // Email entity's shard bump schedule. Records created before
-      // now are unsharded (1 possible shard key). Records created
-      // after now have a 1-char, 2-bit shard key (4 possible shard
-      // keys).
+      uniqueProperty: 'email',
+      timestampProperty: 'created',
       shardBumps: [{ timestamp: now, charBits: 2, chars: 1 }],
-
-      // Email entity generated properties. These keys must match
-      // the ones with never types in the Email interface defined
-      // above, and are marked with a ⚙️ in the table design.
-      generated: {
-        userHashKey: {
-          // When true, if any element is undefined or null, the
-          // generated property will be undefined. When false,
-          // undefined or null elements will be rendered as an
-          // empty string.
-          atomic: true,
-
-          // Elements of the generated property. These MUST be
-          // ungenerated properties (i.e. not marked with never
-          // in the Email interface) and MUST be included in the
-          // entityTranscodes object below. Elements are applied
-          // in order.
-          elements: ["userId"],
-
-          // When this value is true, the generated property will
-          // be sharded.
-          sharded: true,
-        },
-      },
-
-      // Indexes for the Email entity as specified in the index
-      // design.
-      indexes: {
-        // An index hashKey must be either the global hash key or a
-        // sharded generated property. Its rangeKey must be either
-        // the global range key, an scalar ungenerated property, or
-        // an unsharded generated property. Any ungenerated
-        // properties used MUST be included in the entityTranscodes
-        // object below.
-        created: { hashKey: "hashKey", rangeKey: "created" },
-        userCreated: {
-          hashKey: "userHashKey",
-          rangeKey: "created",
-        },
-      },
-
-      // Transcodes for ungenerated properties used as generated
-      // property elements or index components. Transcode values
-      // must be valid config transcodes object keys. Since this
-      // config does not define a transcodes object it uses
-      // defaultTranscodes exported by @karmaniverous/entity-tools.
-      elementTranscodes: {
-        created: "timestamp",
-        userId: "string",
-      },
     },
-    // User entity config.
     user: {
-      uniqueProperty: "userId",
-      timestampProperty: "created",
+      uniqueProperty: 'userId',
+      timestampProperty: 'created',
       shardBumps: [{ timestamp: now, charBits: 2, chars: 1 }],
-      generated: {
-        firstNameRangeKey: {
-          atomic: true,
-          elements: [
-            "firstNameCanonical",
-            "lastNameCanonical",
-            "created",
-          ],
-        },
-        lastNameRangeKey: {
-          atomic: true,
-          elements: [
-            "lastNameCanonical",
-            "firstNameCanonical",
-            "created",
-          ],
-        },
-        userBeneficiaryHashKey: {
-          atomic: true,
-          elements: ["beneficiaryId"],
-          sharded: true,
-        },
-        userHashKey: {
-          atomic: true,
-          elements: ["userId"],
-          sharded: true,
-        },
-      },
-      indexes: {
-        created: ["hashKey", "rangeKey", "created"],
-        firstName: ["hashKey", "rangeKey", "firstNameRangeKey"],
-        lastName: ["hashKey", "rangeKey", "lastNameRangeKey"],
-        phone: ["hashKey", "rangeKey", "phone"],
-        updated: ["hashKey", "rangeKey", "updated"],
-        userBeneficiaryCreated: [
-          "hashKey",
-          "rangeKey",
-          "userBeneficiaryHashKey",
-          "created",
-        ],
-        userBeneficiaryFirstName: [
-          "hashKey",
-          "rangeKey",
-          "userBeneficiaryHashKey",
-          "firstNameRangeKey",
-        ],
-        userBeneficiaryLastName: [
-          "hashKey",
-          "rangeKey",
-          "userBeneficiaryHashKey",
-          "lastNameRangeKey",
-        ],
-        userBeneficiaryPhone: [
-          "hashKey",
-          "rangeKey",
-          "userBeneficiaryHashKey",
-          "phone",
-        ],
-        userBeneficiaryUpdated: [
-          "hashKey",
-          "rangeKey",
-          "userBeneficiaryHashKey",
-          "updated",
-        ],
-      },
-      elementTranscodes: {
-        beneficiaryId: "string",
-        created: "timestamp",
-        firstNameCanonical: "string",
-        lastNameCanonical: "string",
-        phone: "string",
-        updated: "timestamp",
-        userId: "string",
-      },
     },
   },
-};
 
-// Configure & export EntityManager instance.
-export const entityManager = new EntityManager(config, errorLogger);
+  // Generated properties power indexes and alternate hash keys.
+  generatedProperties: {
+    sharded: {
+      beneficiaryHashKey: ['beneficiaryId'] as const,
+      userHashKey: ['userId'] as const,
+    } as const,
+    unsharded: {
+      firstNameRangeKey: [
+        'firstNameCanonical',
+        'lastNameCanonical',
+        'created',
+      ] as const,
+      lastNameRangeKey: [
+        'lastNameCanonical',
+        'firstNameCanonical',
+        'created',
+      ] as const,
+    } as const,
+  } as const,
+
+  // Index tokens exactly match those used by the handlers.
+  indexes: {
+    created: { hashKey: 'hashKey', rangeKey: 'created', projections: [] },
+    firstName: {
+      hashKey: 'hashKey',
+      rangeKey: 'firstNameRangeKey',
+      projections: [],
+    },
+    lastName: {
+      hashKey: 'hashKey',
+      rangeKey: 'lastNameRangeKey',
+      projections: [],
+    },
+    phone: { hashKey: 'hashKey', rangeKey: 'phone', projections: [] },
+    updated: { hashKey: 'hashKey', rangeKey: 'updated', projections: [] },
+    userBeneficiaryCreated: {
+      hashKey: 'beneficiaryHashKey',
+      rangeKey: 'created',
+      projections: [],
+    },
+    userBeneficiaryFirstName: {
+      hashKey: 'beneficiaryHashKey',
+      rangeKey: 'firstNameRangeKey',
+      projections: [],
+    },
+    userBeneficiaryLastName: {
+      hashKey: 'beneficiaryHashKey',
+      rangeKey: 'lastNameRangeKey',
+      projections: [],
+    },
+    userBeneficiaryPhone: {
+      hashKey: 'beneficiaryHashKey',
+      rangeKey: 'phone',
+      projections: [],
+    },
+    userBeneficiaryUpdated: {
+      hashKey: 'beneficiaryHashKey',
+      rangeKey: 'updated',
+      projections: [],
+    },
+    userCreated: {
+      hashKey: 'userHashKey',
+      rangeKey: 'created',
+      projections: [],
+    },
+  } as const,
+
+  // Map domain fields to transcoding strategies for generated tokens.
+  propertyTranscodes: {
+    beneficiaryId: 'string',
+    created: 'timestamp',
+    email: 'string',
+    firstNameCanonical: 'string',
+    lastNameCanonical: 'string',
+    phone: 'string',
+    updated: 'timestamp',
+    userId: 'string',
+  },
+
+  // Keep default transcoding behavior.
+  transcodes: defaultTranscodes,
+} satisfies ConfigInput;
+
+export const entityManager = createEntityManager(config, errorLogger);
 ```
 
-### Item Types
-
-The `Email` and `User` interfaces defined above are not useful for database operations because...
-
-- they don't include the `hashKey` and `rangeKey` properties that we specified in our **Entity Manager** `config` object, and
-
-- their generated properties all have a `never` type.
-
-The [`ItemMap`](http://localhost:4000/projects/entity-manager/configuration/#the-itemmap-type) type takes our `EntityMap` type as a parameter and returns a map of the correct item types. Let's do this and export the result for use in our endpoint handlers.
-
-Visit [`entityManager.ts`](https://github.com/karmaniverous/entity-manager-demo/blob/main/src/entityManager.ts) to see this code in context.
-
-```ts
-import type { ItemMap } from "@karmaniverous/entity-manager";
-
-// Construct ItemMap type from MyEntityMap.
-type MyItemMap = ItemMap<MyEntityMap>;
-
-// Export EmailItem & UserItem types for use in other modules.
-export type EmailItem = MyItemMap["email"];
-export type UserItem = MyItemMap["user"];
-```
+This values‑first literal preserves tokens such as `hashKey`, `rangeKey`, and index names exactly, so you get strong, token‑aware inference across the stack without generics or casts.
 
 ## `EntityClient` Configuration
 
 {% include figure image_path="https://raw.githubusercontent.com/karmaniverous/entity-manager-demo/main/assets/entityClient.png" caption="_`EntityClient` configuration._" %}
 
-The [`EntityClient`](https://docs.karmanivero.us/entity-client-dynamodb/classes/index.EntityClient.html) class combines the [`DynamoDBClient`](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/dynamodb/) and [`DynamoDBDocument`](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/Package/-aws-sdk-lib-dynamodb/Class/DynamoDBDocument/) classes from the AWS SDK with some higher-level functions to provide a simplified interface over key interactions with a DynamoDB database, as well as improved handling of batch operations.
+The [`EntityClient`](https://docs.karmanivero.us/entity-client-dynamodb/classes/index.EntityClient.html) class combines the AWS SDK’s DynamoDB client and document layer with a few high‑level helpers (batched writes, table lifecycle, etc.) and a typed query builder.
 
-For example:
-
-- The [`createTable`](https://docs.karmanivero.us/entity-client-dynamodb/classes/index.EntityClient.html#createTable) method leverages its internal `DynamoDBClient` instance to create a table, then calls [`waitUntilTableExists`](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/Package/-aws-sdk-client-dynamodb/Variable/waitUntilTableExists) to block further execution until the new table is actually available for data operations.
-
-- The [`putItems`](https://docs.karmanivero.us/entity-client-dynamodb/classes/index.EntityClient.html#putItems) method breaks an array of entity items into multiple batches, then leverages the `DynamoDBDocument` [`BatchWriteCommand`](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/Package/-aws-sdk-lib-dynamodb/Class/BatchWriteCommand/) to perform throttled batched writes to the database in parallel.
-
-The class also provides direct access to the underlying `DynamoDBClient` and `DynamoDBDocument` instances, so any operations not supported by enhanced `EntityClient` methods are also available. This demo will provide examples of both modes of operation.
-
-See the [`entity-client-dynamodb`](https://github.com/karmaniverous/entity-client-dynamodb) repository for more info.
-
-As with the [`EntityManager` instance configuration](#entitymanager-configuration) above, we have injected an `errorLogger` object that proxies `console` to disable debug logging in the `EntityClient` instance while keeping it enabled elsewhere. See my [`controlled-proxy`](https://github.com/karmaniverous/controlled-proxy) repo for more info!
-
-Otherwise, the [`EntityClientOptions`](https://docs.karmanivero.us/entity-client-dynamodb/interfaces/index.EntityClientOptions.html) type is only a slight extension of the familiar [`DynamoDBClientConfig`](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/Package/-aws-sdk-client-dynamodb/Interface/DynamoDBClientConfig) type, so configuring the `EntityClient` instance for this demo is straightforward.
-
-Visit [`entityClient.ts`](https://github.com/karmaniverous/entity-manager-demo/blob/main/src/entityClient.ts) to see this code in context.
+In this demo we wire it to our manager and point it at DynamoDB Local:
 
 ```ts
-import { EntityClient } from "@karmaniverous/entity-client-dynamodb";
+// src/entity-manager/entityClient.ts
+import { EntityClient } from '@karmaniverous/entity-client-dynamodb';
 
-import { errorLogger } from "./logger";
+import { errorLogger } from '../util/logger';
+import { entityManager } from './entityManager';
 
 export const entityClient = new EntityClient({
   credentials: {
-    accessKeyId: "fakeAccessKeyId",
-    secretAccessKey: "fakeSecretAccessKey",
+    accessKeyId: 'fakeAccessKeyId',
+    secretAccessKey: 'fakeSecretAccessKey',
   },
-  endpoint: "http://localhost:8000",
+  endpoint: 'http://localhost:8000', // DynamoDB Local
+  entityManager, // typed — keeps reads/writes in sync
   logger: errorLogger,
-  region: "local",
+  region: 'local',
+  tableName: 'UserService',
 });
 ```
+
+Two things to notice:
+
+- We pass the `entityManager` so token‑aware helpers (addKeys, removeKeys, getPrimaryKey) and typed reads/writes use the same configuration.
+- We keep the endpoint local and credentials fake—DynamoDB Local doesn’t need real AWS credentials.
+
+It’s also common to generate a table definition from the manager for local/dev:
+
+```ts
+import { generateTableDefinition } from '@karmaniverous/entity-client-dynamodb';
+
+await entityClient.createTable({
+  ...generateTableDefinition(entityClient.entityManager),
+  BillingMode: 'PAY_PER_REQUEST',
+});
+```
+
+The generator converts your config’s indexes and tokens into DynamoDB KeySchema, GSI definitions, and attribute types.
 
 ## Endpoint Handlers
 
 {% include figure image_path="https://raw.githubusercontent.com/karmaniverous/entity-manager-demo/main/assets/handler.png" caption="_CRUD & search handler structure._" %}
 
-Every handler function defined below follows the pattern illustrated in the diagram above. Here's a breakdown of the key elements in the diagram:
+Every handler follows the same pattern:
 
-- **`User`** is the type used in your application to represent a User object, not including all the generated properties used by **Entity Manager** to support database operations. Depending on handler requirements, `Email` is also available.
+- Accept/validate params in domain shape (e.g., `UserItem`, `EmailItem`).
+- Use Entity Manager helpers to materialize or strip generated/global keys.
+- Delegate reads/writes to EntityClient.
+- For searches, use the QueryBuilder to compose per‑index conditions, then ask the manager to orchestrate a cross‑shard, multi‑index query.
 
-- **`params`** are the parameters received by the `handler` function. In most cases this object's type will be some variant on the `User` or `Email` type.
-
-- **`UserItem`** is the complete User type stored in the database, including all generated properties specified in the `EntityManager` [configuration](https://docs.karmanivero.us/entity-manager/types/entity_manager.ParsedConfig.html). Depending on handler requirements, `EmailItem` is also available.
-
-- **`handler`** is the function that handles the actual data request. As we will see below, with **Entity Manager** in place this code can be _very_ compact and efficient! Internally, the `handler` function will use the `UserItem` and `EmailItem` types to interact with the database.
-
-- **`entityManager`** is an instance of the [`EntityManager`](https://docs.karmanivero.us/entity-manager/classes/index.EntityManager.html) class, which is initialized with a configuration reflecting the design summarized [here](/projects/entity-manager/evolving-a-nosql-db-schema/#recap). This object gives our handler the ability to add and remove generated properties from a `UserItem` or `EmailItem` and to perform query and CRUD operations on these entities in the database.
-
-- **`entityClient`** is an instance of the DynamoDB-specific [`EntityClient`](https://docs.karmanivero.us/entity-client-dynamodb/classes/index.EntityClient.html) class, initialized to connect with the User Service table in DynamoDB. In principle we could accomplish everything in this demo using [`DynamoDBClient`](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/dynamodb/) and [`DynamoDBDocument`](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/Package/-aws-sdk-lib-dynamodb/Class/DynamoDBDocument/) from the native DynamoDB SDK, but the `EntityClient` class simplifies database interactions and eliminates a lot of noise that would otherwise interfere with the clarity of this demo. We'll also use a utility function from the same library to generate our DynamoDB table definition from our **Entity Manager** config!
-
-- **`shardQueryMapBuilder`** is a [`ShardQueryMapBuilder`](https://docs.karmanivero.us/entity-client-dynamodb/classes/index.QueryBuilder.html) instance declared internally by handler functions (like search endpoints) that require the ability to perform cross-shard, multi-index database queries. Each instance is handler-specific, so this object is not shared between handlers.
-
-- **`logger`** is simply an alias of `console`. Feel free to replace it with your favorite logger!
+Below are small, focused examples with explanations.
 
 ### Email Entity
 
@@ -493,19 +385,159 @@ Every handler function defined below follows the pattern illustrated in the diag
 
 #### Create Email
 
-TODO
+```ts
+// src/handlers/email/createEmail.ts (excerpt)
+export const createEmail = async (
+  params: CreateEmailParams, // EmailItem with 'created' optional
+): Promise<EmailItem> => {
+  const entityToken = 'email';
+
+  // Extract & normalize for uniqueness (case-insensitive)
+  const { email, userId, ...rest } = params;
+  const normalizedEmail = email.toLowerCase();
+
+  // Guard against duplicates — uniqueProperty is 'email'
+  if ((await readEmail(normalizedEmail)).length)
+    throw new Error('Email record already exists.');
+
+  // Create the domain item
+  const now = Date.now();
+  const item: EmailItem = {
+    ...rest,
+    created: now,
+    email: normalizedEmail,
+    userId,
+  };
+
+  // Add generated/global keys and persist
+  const record = entityClient.entityManager.addKeys(entityToken, item);
+  await entityClient.putItem(record);
+
+  return item; // return the domain item shape
+};
+```
+
+Explanation:
+
+- We normalize the email address to enforce case‑insensitive uniqueness and check for pre‑existence using the `readEmail` helper.
+- `addKeys('email', item)` computes the storage‑facing record with global keys and any generated tokens, so we can write it with `putItem`.
+- The handler returns the domain `EmailItem` so callers don’t see storage keys.
 
 #### Read Email
 
-TODO
+```ts
+// src/handlers/email/readEmail.ts (excerpt)
+export function readEmail(
+  email: EmailItem['email'],
+  keepKeys: true,
+): Promise<EmailRecord[]>; // records with keys
+export function readEmail(
+  email: EmailItem['email'],
+  keepKeys?: false,
+): Promise<EmailItem[]>; // domain items (keys removed)
+export async function readEmail(email: EmailItem['email'], keepKeys = false) {
+  const entityToken = 'email' as const;
+
+  const keys = entityClient.entityManager.getPrimaryKey(entityToken, {
+    email: email.toLowerCase(),
+  });
+
+  const { items } = await entityClient.getItems(entityToken, keys);
+  if (keepKeys) return items;
+
+  return entityClient.entityManager.removeKeys(entityToken, items);
+}
+```
+
+Explanation:
+
+- Overloads give you a choice: storage records (for internal flows) or pure domain items (for API responses).
+- Token‑aware `getPrimaryKey` and `getItems` keep the code short and strongly typed.
+- `removeKeys` strips generated/global keys from records to return domain items.
 
 #### Delete Email
 
-TODO
+```ts
+// src/handlers/email/deleteEmail.ts (excerpt)
+export const deleteEmail = async (email: EmailItem['email']): Promise<void> => {
+  const entityToken = 'email';
+
+  // Read first → derive exact primary keys → delete
+  const items = await readEmail(email, true);
+  if (!items.length) throw new Error('Email records do not exist.');
+
+  const keys = entityClient.entityManager.getPrimaryKey(entityToken, items);
+  await entityClient.deleteItems(keys);
+};
+```
+
+Explanation:
+
+- Deleting by unique email is a two‑step: read to get exact keys, then delete. This prevents accidental deletion by partial keys and confirms existence.
 
 #### Search Emails
 
-TODO
+```ts
+// src/handlers/email/searchEmails.ts (excerpt)
+export const searchEmails = async (params: SearchEmailsParams) => {
+  const { createdFrom, createdTo, pageKeyMap, sortDesc, userId } = params;
+  const entityToken = 'email';
+
+  // Hash-key token varies by scope: global vs user-scoped
+  const hashKeyToken = userId ? 'userHashKey' : 'hashKey';
+
+  // CF literal narrows index tokens (and page keys) at compile time
+  const cf = {
+    indexes: {
+      created: { hashKey: 'hashKey', rangeKey: 'created' },
+      userCreated: { hashKey: 'userHashKey', rangeKey: 'created' },
+    },
+  } as const;
+
+  // Pick the specific index token given the scope
+  const indexToken = hashKeyToken === 'userHashKey' ? 'userCreated' : 'created';
+
+  // Compose and execute a cross-shard query
+  const result = await createQueryBuilder({
+    entityClient,
+    entityToken,
+    hashKeyToken,
+    pageKeyMap,
+    cf,
+  })
+    .addRangeKeyCondition(indexToken, {
+      property: 'created',
+      operator: 'between',
+      value: { from: createdFrom, to: createdTo },
+    })
+    .query({
+      item: userId ? { userId } : {},
+      sortOrder: [{ property: 'created', desc: sortDesc }],
+      timestampFrom: createdFrom,
+      timestampTo: createdTo,
+    });
+
+  if (!result.items.length) return result;
+
+  // Enrich items then sort by a domain property
+  const keys = entityClient.entityManager.getPrimaryKey(
+    entityToken,
+    result.items,
+  );
+  const { items } = await entityClient.getItems(keys);
+  result.items = entityClient.entityManager.removeKeys(
+    entityToken,
+    sort(items, [{ property: 'created', desc: sortDesc }]),
+  );
+  return result;
+};
+```
+
+Explanation:
+
+- We choose the hash‑key token based on whether the search is user‑scoped or global, then use a tiny CF literal to drive index‑token and page‑key typing.
+- The manager executes throttled, parallel shard queries to cover the time window. It returns `{ items, count, pageKeyMap }`.
+- We enrich and sort on a domain field (`created`) and return domain items (keys removed). The `pageKeyMap` is a single compact string you pass back to fetch the next page.
 
 ### User Entity
 
@@ -513,20 +545,402 @@ TODO
 
 #### Create User
 
-TODO
+```ts
+// src/handlers/user/createUser.ts (excerpt)
+export const createUser = async (
+  params: CreateUserParams,
+): Promise<UserItem> => {
+  const entityToken = 'user';
+  const { firstName, lastName, userId, ...rest } = params;
+
+  // Guard: if a userId is provided and exists, fail fast
+  if (userId && (await readUser(userId)).length)
+    throw new Error('Email record already exists.');
+
+  // Canonicalize to enable normalized search
+  const now = Date.now();
+  const item: UserItem = {
+    ...rest,
+    created: now,
+    firstName,
+    firstNameCanonical: normstr(firstName) ?? '',
+    lastName,
+    lastNameCanonical: normstr(lastName) ?? '',
+    updated: now,
+    userId: userId ?? nanoid(),
+  };
+
+  // Add keys & persist; return domain item
+  const record = entityClient.entityManager.addKeys(entityToken, item);
+  await entityClient.putItem(record);
+  return item;
+};
+```
+
+Explanation:
+
+- `normstr` builds canonical forms for case/whitespace/diacritic‑insensitive search.
+- We generate or reuse `userId`, set timestamps, materialize keys with `addKeys`, and persist.
 
 #### Read User
 
-TODO
+```ts
+// src/handlers/user/readUser.ts (excerpt)
+export function readUser(
+  userId: UserItem['userId'],
+  keepKeys: true,
+): Promise<UserRecord[]>; // records with keys
+export function readUser(
+  userId: UserItem['userId'],
+  keepKeys?: false,
+): Promise<UserItem[]>; // domain items (keys removed)
+export async function readUser(userId: UserItem['userId'], keepKeys = false) {
+  const entityToken = 'user' as const;
+
+  const keys = entityClient.entityManager.getPrimaryKey(entityToken, {
+    userId,
+  });
+  const { items } = await entityClient.getItems(entityToken, keys);
+  if (keepKeys) return items;
+
+  return entityClient.entityManager.removeKeys(entityToken, items);
+}
+```
+
+Explanation:
+
+- Overloads mirror the email reader. Token‑aware helpers keep the function tiny and strongly typed.
 
 #### Update User
 
-TODO
+```ts
+// src/handlers/user/updateUser.ts (excerpt)
+export const updateUser = async (
+  data: MakeUpdatable<UserItem, 'userId'>,
+): Promise<UserItem[]> => {
+  const entityToken = 'user';
+
+  // Read domain items to update
+  const { firstName, lastName, userId, ...rest } = data;
+  const items = await readUser(userId);
+  if (!items.length) throw new Error('User records do not exist.');
+
+  // Shallow update semantics: undefined ignored; null assigned (and removed)
+  const updatedItems = items.map((item) =>
+    updateRecord(item, {
+      firstName,
+      firstNameCanonical: normstr(firstName),
+      lastName,
+      lastNameCanonical: normstr(lastName),
+      updated: Date.now(),
+      ...rest,
+    }),
+  );
+
+  // Re-materialize keys and persist the records
+  const updatedRecords = entityClient.entityManager.addKeys(
+    entityToken,
+    updatedItems,
+  );
+  await entityClient.putItems(updatedRecords);
+
+  return updatedItems; // domain items
+};
+```
+
+Explanation:
+
+- `updateRecord` implements safe shallow merges with predictable semantics—ideal for HTTP PATCH‑style updates.
+- We re‑materialize keys from the updated domain items and write them back in batch.
 
 #### Delete User
 
-TODO
+```ts
+// src/handlers/user/deleteUser.ts (excerpt)
+export const deleteUser = async (userId: UserItem['userId']): Promise<void> => {
+  const entityToken = 'user';
+
+  // Read first → derive exact primary keys → delete
+  const items = await readUser(userId, true);
+  if (!items.length) throw new Error('User records do not exist.');
+
+  const keys = entityClient.entityManager.getPrimaryKey(entityToken, items);
+  await entityClient.deleteItems(keys);
+};
+```
+
+Explanation:
+
+- Same pattern as email delete: read records with keys; derive exact primary keys; delete.
 
 #### Search Users
 
-TODO
+This is the most interesting flow: multiple scopes (global or beneficiary‑scoped), multiple indexes (created/updated/name/phone), and result sorting on domain properties. The code mirrors the design from the “Evolving a NoSQL Schema” article.
+
+```ts
+// src/handlers/user/searchUsers.ts (excerpt)
+export const searchUsers = async (params: SearchUsersParams) => {
+  const entityToken = 'user';
+
+  // Normalize user-supplied filters
+  const {
+    beneficiaryId,
+    createdFrom,
+    createdTo,
+    pageKeyMap,
+    sortDesc,
+    updatedFrom,
+    updatedTo,
+  } = params;
+  const name = normstr(params.name);
+  const phone = normstr(params.phone);
+
+  // Choose a default sort order consistent with supplied filters
+  const sortOrder: NonNullable<typeof params.sortOrder> =
+    params.sortOrder ??
+    (name ? 'name' : updatedFrom || updatedTo ? 'updated' : 'created');
+
+  // Switch between global and beneficiary-scoped hash keys
+  const hashKeyToken = beneficiaryId ? 'beneficiaryHashKey' : 'hashKey';
+
+  // Derive which index range-keys we need given supplied filters
+  const rangeKeyTokens = phone
+    ? ['phone']
+    : sortOrder === 'created'
+      ? ['created']
+      : sortOrder === 'name'
+        ? name
+          ? ['firstNameRangeKey', 'lastNameRangeKey']
+          : ['lastNameRangeKey']
+        : ['updated'];
+
+  // CF literal constrains index tokens for typing and narrows page keys
+  const cf = {
+    indexes: {
+      created: { hashKey: 'hashKey', rangeKey: 'created' },
+      firstName: { hashKey: 'hashKey', rangeKey: 'firstNameRangeKey' },
+      lastName: { hashKey: 'hashKey', rangeKey: 'lastNameRangeKey' },
+      phone: { hashKey: 'hashKey', rangeKey: 'phone' },
+      updated: { hashKey: 'hashKey', rangeKey: 'updated' },
+      userBeneficiaryCreated: {
+        hashKey: 'beneficiaryHashKey',
+        rangeKey: 'created',
+      },
+      userBeneficiaryFirstName: {
+        hashKey: 'beneficiaryHashKey',
+        rangeKey: 'firstNameRangeKey',
+      },
+      userBeneficiaryLastName: {
+        hashKey: 'beneficiaryHashKey',
+        rangeKey: 'lastNameRangeKey',
+      },
+      userBeneficiaryPhone: {
+        hashKey: 'beneficiaryHashKey',
+        rangeKey: 'phone',
+      },
+      userBeneficiaryUpdated: {
+        hashKey: 'beneficiaryHashKey',
+        rangeKey: 'updated',
+      },
+      userCreated: { hashKey: 'userHashKey', rangeKey: 'created' },
+    },
+  } as const;
+
+  // Route map from (hashKeyToken, rangeKeyToken) → index token
+  const route = {
+    hashKey: {
+      created: 'created',
+      firstNameRangeKey: 'firstName',
+      lastNameRangeKey: 'lastName',
+      phone: 'phone',
+      updated: 'updated',
+    },
+    beneficiaryHashKey: {
+      created: 'userBeneficiaryCreated',
+      firstNameRangeKey: 'userBeneficiaryFirstName',
+      lastNameRangeKey: 'userBeneficiaryLastName',
+      phone: 'userBeneficiaryPhone',
+      updated: 'userBeneficiaryUpdated',
+    },
+  } as const;
+
+  // Start a typed builder; pageKeyMap lets us resume paging
+  let queryBuilder = createQueryBuilder({
+    entityClient,
+    entityToken,
+    hashKeyToken,
+    pageKeyMap,
+    cf,
+  });
+
+  // Add per-index range & filter conditions
+  for (const rangeKeyToken of rangeKeyTokens) {
+    const indexToken =
+      route[hashKeyToken][rangeKeyToken as keyof (typeof route)['hashKey']];
+
+    if (rangeKeyToken === 'created')
+      queryBuilder = queryBuilder.addRangeKeyCondition(indexToken, {
+        property: 'created',
+        operator: 'between',
+        value: { from: createdFrom, to: createdTo },
+      });
+    else if (rangeKeyToken === 'firstNameRangeKey')
+      queryBuilder = queryBuilder.addRangeKeyCondition(indexToken, {
+        property: 'firstNameRangeKey',
+        operator: 'begins_with',
+        value: entityClient.entityManager.encodeGeneratedProperty(
+          'firstNameRangeKey',
+          { firstNameCanonical: name },
+        ),
+      });
+    else if (rangeKeyToken === 'lastNameRangeKey')
+      queryBuilder = queryBuilder.addRangeKeyCondition(indexToken, {
+        property: 'lastNameRangeKey',
+        operator: 'begins_with',
+        value: entityClient.entityManager.encodeGeneratedProperty(
+          'lastNameRangeKey',
+          { lastNameCanonical: name },
+        ),
+      });
+    else if (rangeKeyToken === 'phone')
+      queryBuilder = queryBuilder.addRangeKeyCondition(indexToken, {
+        property: 'phone',
+        operator: 'begins_with',
+        value: phone,
+      });
+    else if (rangeKeyToken === 'updated')
+      queryBuilder = queryBuilder.addRangeKeyCondition(indexToken, {
+        property: 'updated',
+        operator: 'between',
+        value: { from: updatedFrom, to: updatedTo },
+      });
+    else throw new Error(`Unsupported range key token '${rangeKeyToken}'.`);
+
+    // Filters for dimensions not covered by the range-key choice
+    if ((createdFrom || createdTo) && rangeKeyToken !== 'created')
+      queryBuilder = queryBuilder.addFilterCondition(indexToken, {
+        property: 'created',
+        operator: 'between',
+        value: { from: createdFrom, to: createdTo },
+      });
+
+    if (
+      name &&
+      !['firstNameRangeKey', 'lastNameRangeKey'].includes(rangeKeyToken)
+    )
+      queryBuilder = queryBuilder.addFilterCondition(indexToken, {
+        operator: 'or',
+        conditions: [
+          {
+            property: 'firstNameCanonical',
+            operator: 'begins_with',
+            value: name,
+          },
+          {
+            property: 'lastNameCanonical',
+            operator: 'begins_with',
+            value: name,
+          },
+        ],
+      });
+
+    if ((updatedFrom || updatedTo) && rangeKeyToken !== 'updated')
+      queryBuilder = queryBuilder.addFilterCondition(indexToken, {
+        property: 'updated',
+        operator: 'between',
+        value: { from: updatedFrom, to: updatedTo },
+      });
+  }
+
+  // Execute the cross-shard query; empty item for global scope
+  const result = await queryBuilder.query({
+    item: beneficiaryId ? { beneficiaryId } : {},
+    timestampFrom: createdFrom,
+    timestampTo: createdTo,
+  });
+
+  if (!result.items.length) return result;
+
+  // Enrich and sort on domain properties
+  const keys = entityClient.entityManager.getPrimaryKey(
+    entityToken,
+    result.items,
+  );
+  const { items } = await entityClient.getItems(keys);
+
+  const sortedItems = sort(items, [
+    {
+      property: sortOrder === 'name' ? 'lastNameCanonical' : sortOrder,
+      desc: sortDesc,
+    },
+  ]);
+
+  result.items = entityClient.entityManager.removeKeys(
+    entityToken,
+    sortedItems,
+  );
+  return result;
+};
+```
+
+Explanation:
+
+- We select the hash‑key token based on whether the search is beneficiary‑scoped or global. A small CF literal constrains valid index tokens and narrows page‑key typing at compile time.
+- Range‑key conditions change based on sort dimension (time, name, or phone). We complement them with filter conditions for other dimensions as needed.
+- The manager fans out throttled queries across the effective shard space and merges results with dedupe and paging; we then enrich and sort on domain properties for presentation.
+
+## A note on tests (Vitest)
+
+The test suite sets up DynamoDB Local, creates the table from your config, exercises CRUD and search, and tears down the container.
+
+```ts
+// src/entity-manager/entityClient.test.ts (excerpt)
+import { ListTablesCommand } from '@aws-sdk/client-dynamodb';
+import {
+  dynamoDbLocalReady,
+  setupDynamoDbLocal,
+  teardownDynamoDbLocal,
+} from '@karmaniverous/dynamodb-local';
+import { generateTableDefinition } from '@karmaniverous/entity-client-dynamodb';
+
+import { env } from '../env';
+import { entityClient } from './entityClient';
+
+describe('entityClient', () => {
+  beforeAll(async () => {
+    await setupDynamoDbLocal(env.dynamoDbLocalPort);
+    await dynamoDbLocalReady(entityClient.client);
+  });
+
+  afterAll(async () => {
+    await teardownDynamoDbLocal();
+  });
+
+  it('creates & deletes user table', async () => {
+    await entityClient.createTable({
+      ...generateTableDefinition(entityClient.entityManager),
+      BillingMode: 'PAY_PER_REQUEST',
+    });
+
+    let tables = await entityClient.client.send(new ListTablesCommand());
+    expect(tables.TableNames).to.deep.equal([entityClient.tableName]);
+
+    await entityClient.deleteTable();
+    tables = await entityClient.client.send(new ListTablesCommand());
+    expect(tables.TableNames).to.deep.equal([]);
+  });
+});
+```
+
+This provides a fast, repeatable environment to validate both orchestration (manager/query) and adapter wiring (DynamoDB operations) with no cloud dependencies.
+
+---
+
+That’s the full walkthrough of the current demo:
+
+- Value‑first + schema‑first Entity Manager configuration.
+- DynamoDB adapter wiring with typed CRUD and table lifecycle.
+- Token‑aware reads/writes and index‑aware cross‑shard queries.
+- Concise handlers that are easy to test and reason about.
+
+If you have questions or ideas for improving the demo, [join the discussion](https://github.com/karmaniverous/entity-manager-demo/discussions)!

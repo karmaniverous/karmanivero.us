@@ -4,7 +4,6 @@ excerpt: NoSQL shifts the burden of complexity from the database platform to the
 permalink: /projects/entity-manager/intro/
 redirect_from:
   - /projects/entity-manager/
-under_construction: true
 related: true
 tags:
   - aws
@@ -23,16 +22,15 @@ The **Entity Manager** package implements rational indexing & cross-shard queryi
 
 Traditional [relational database](https://en.wikipedia.org/wiki/Relational_database) systems like [MySQL](https://www.mysql.com/) implement indexing & scaling strategies at a platform level based on schemas defined at design time.
 
-**This documentation is under construction!** There is a _lot_ to unpack here, so it will be a few weeks before I can call it done. Meanwhile, please feel free to [reach out](https://github.com/karmaniverous/entity-manager/discussions/) with any questions or feedback!
-{: .notice--warning}
+This guide reflects the current TypeScript‑first, inference‑driven flow: author a values‑first config literal (`as const`), optionally provide Zod schemas for your entities, and create an EntityManager via `createEntityManager(config, logger?)`. Queries are composed with a small QueryBuilder over indexes and executed across shards with automatic paging.
 
-NoSQL platforms like [DynamoDB](https://aws.amazon.com/dynamodb/) offer far better performance at scale, but structured index & shard keys must be defined as data elements and exploited by application logic in data retrieval & cross-shard queries.
-
-> NoSQL shifts the burden of complexity from the database platform to the developer. **Entity Manager** sweeps it under the rug.
+Please feel free to [reach out](https://github.com/karmaniverous/entity-manager/discussions) with any questions or feedback!
 
 ## What is Entity Manager?
 
 **Entity Manager** encapsulates a **provider-agnostic, highly opinionated approach** to the [single-table design pattern](https://aws.amazon.com/blogs/compute/creating-a-single-table-design-with-amazon-dynamodb/).
+
+> NoSQL shifts the burden of complexity from the database platform to the developer. **Entity Manager** sweeps it under the rug.
 
 With **Entity Manager**, you can:
 
@@ -53,6 +51,76 @@ Consequently, this documentation takes a _Typescript-first_ approach! All discus
 The following sections present a breakdown of this guide.
 
 ### Introduction
+
+- Quick start (values‑first + schema‑first)
+
+```ts
+import { z } from 'zod';
+import { createEntityManager } from '@karmaniverous/entity-manager';
+import { defaultTranscodes } from '@karmaniverous/entity-tools';
+
+// 1) Schema-first domain shapes (base fields only; no generated/global keys)
+const emailSchema = z.object({
+  created: z.number(),
+  email: z.string(), // uniqueProperty
+  userId: z.string(),
+});
+
+const userSchema = z.object({
+  beneficiaryId: z.string(),
+  created: z.number(), // timestampProperty
+  firstName: z.string(),
+  firstNameCanonical: z.string(),
+  lastName: z.string(),
+  lastNameCanonical: z.string(),
+  phone: z.string().optional(),
+  updated: z.number(),
+  userId: z.string(), // uniqueProperty
+});
+
+// 2) Values-first config literal (as const)
+const now = Date.now();
+const config = {
+  hashKey: 'hashKey',
+  rangeKey: 'rangeKey',
+  entitiesSchema: { email: emailSchema, user: userSchema } as const,
+  entities: {
+    email: {
+      uniqueProperty: 'email',
+      timestampProperty: 'created',
+      shardBumps: [{ timestamp: now, charBits: 2, chars: 1 }],
+    },
+    user: {
+      uniqueProperty: 'userId',
+      timestampProperty: 'created',
+      shardBumps: [{ timestamp: now, charBits: 2, chars: 1 }],
+    },
+  },
+  generatedProperties: {
+    sharded: {
+      userHashKey: ['userId'],
+      beneficiaryHashKey: ['beneficiaryId'],
+    } as const,
+    unsharded: {
+      firstNameRangeKey: ['firstNameCanonical', 'lastNameCanonical', 'created'],
+      lastNameRangeKey: ['lastNameCanonical', 'firstNameCanonical', 'created'],
+    } as const,
+  },
+  indexes: {
+    created: { hashKey: 'hashKey', rangeKey: 'created' },
+    // ...add the rest of your index tokens as needed
+  } as const,
+  propertyTranscodes: {
+    email: 'string',
+    userId: 'string',
+    created: 'timestamp',
+    // ...add the rest of your transcodes as needed
+  },
+  transcodes: defaultTranscodes,
+} as const;
+
+export const entityManager = createEntityManager(config);
+```
 
 - [**SQL vs NoSQL**](/projects/entity-manager/sql-vs-nosql/) – A comparison of the two database paradigms and how **Entity Manager** bridges the gap.
 

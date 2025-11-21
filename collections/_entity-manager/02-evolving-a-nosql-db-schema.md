@@ -26,9 +26,6 @@ By way of example, this section will start with a simple data model, evolve a da
 [NoSQL](https://en.wikipedia.org/wiki/NoSQL) databases do not offer the [schema & query abstractions](/projects/entity-manager/sql-vs-nosql) enjoyed by [RDBMS](https://en.wikipedia.org/wiki/Relational_database) developers, so any NoSQL database schema will be intrinsically platform-specific. **This example will evolve a database schema for the [DynamoDB](https://aws.amazon.com/dynamodb/) platform**, but the presented design _process_ should work equally well against any NoSQL database platform.
 {: .notice--info}
 
-**Entity Manager is still under construction!** I'm wrapping up the Typescript refactor & writing the demo & documentation, so we should be ready for production in a few weeks. Meanwhile, please feel free to [reach out](https://github.com/karmaniverous/entity-manager/discussions/) with any questions or feedback!
-{: .notice--warning}
-
 ## A Microservices Application
 
 Imagine an application that tracks the credit card transactions of its users.
@@ -356,7 +353,7 @@ Here's a consolidated list of the resulting indexes:
 | `lastName`             | User         | Hash Key        | `hashKey`           |
 |                        |              | Range Key       | `lastNameRangeKey`  |
 | `phone`                | User         | Hash Key        | `hashKey`           |
-|                        |              | Range Key       | `lastNameRangeKey`  |
+|                        |              | Range Key       | `phone`             |
 | `updated`              | User         | Hash Key        | `hashKey`           |
 |                        |              | Range Key       | `updated`           |
 | `userCreated`          | Email        | Hash Key        | `userId`            |
