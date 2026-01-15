@@ -1,0 +1,12 @@
+stan-core:
+  stanPath: .stan
+  includes: []
+  excludes: ["assets/swagger/**", "collections", "diagrams"]
+stan-cli:
+  cliDefaults:
+    run:
+      facets: true
+      plan: false
+      sequential: true
+  scripts: {}
+  patchOpenCommand: code -g {file}

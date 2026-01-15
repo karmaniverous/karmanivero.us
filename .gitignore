@@ -30,3 +30,9 @@ codekit-config.json
 .sass-cache
 _asset_bundler_cache
 _site
+.stan/output/
+.stan/diff/
+.stan/dist/
+.stan/patch/
+.stan/system/facet.state.json
+.stan/system/.docs.meta.json
