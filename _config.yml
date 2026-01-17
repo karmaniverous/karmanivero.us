@@ -260,7 +260,7 @@ plugins:
   - jekyll-paginate-v2
   - jekyll-redirect-from
   - jekyll-sitemap
-  
+
 # Archives
 #  Type
 #  - GitHub Pages compatible archive pages built with Liquid ~> type: liquid (default)

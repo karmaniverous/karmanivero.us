@@ -1,0 +1,42 @@
+---
+layout: null
+permalink: /sitemap-index.xml
+repos:
+  - aws-api-gateway-tools
+  - aws-secrets-manager-tools
+  - aws-xray-tools
+  - batch-process
+  - batchable
+  - cached-axios
+  - controlled-proxy
+  - dynamodb-local
+  - entity-client-dynamodb
+  - entity-manager
+  - entity-manager-demo
+  - entity-tools
+  - get-dotenv
+  - hook-form-semantic
+  - loggable
+  - mock-db
+  - npm-package-template-ts
+  - react-component-npm-package-template-ts
+  - rrstack
+  - smoz
+  - stan-cli
+  - stan-core
+  - string-utilities
+  - typedoc-plugin-sitemap
+---
+
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>{{ site.url }}/sitemap.xml</loc>
+  </sitemap>
+
+  {% for repo in page.repos %}
+  <sitemap>
+    <loc>https://docs.karmanivero.us/{{ repo }}/sitemap.xml</loc>
+  </sitemap>
+  {% endfor %}
+</sitemapindex>

@@ -81,7 +81,7 @@ In order to use `entity-manager` effectively, you need to understand:
 
 - How to define [generated properties](https://docs.karmanivero.us/entity-manager/types/entity_manager.ConfigEntityGenerated.html) & indexes
 
-- [Transcodes](https://docs.karmanivero.us/entity-manager/types/entity_manager.Transcodes-1.html) and how to connect them to generated property & index elements
+- [Transcodes](https://docs.karmanivero.us/entity-tools/types/entity-tools.Transcodes.html) and how to connect them to generated property & index elements
 
 - How to write a [ShardQueryFunction](https://docs.karmanivero.us/entity-manager/types/entity_manager.ShardQueryFunction.html) & pass it to the [`EntityManager`](https://docs.karmanivero.us/entity-manager/classes/entity_manager.EntityManager.html) class
 
