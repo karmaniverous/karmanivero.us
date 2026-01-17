@@ -24,7 +24,7 @@ I have WhatsApp installed on my Windows desktop, because why not. And when I man
 Since I spend so much time in front of my laptop, I make extensive use of the WhatsApp desktop client. Just makes sense.
 
 **The Evil Empire Strikes Again!** A recent Windows update broke this entire solution. For a much better fix, see [my follow-up post on win-link-router](/win-link-router/).
-{: .notice--error}
+{: .notice--danger}
 
 This will be child's play for you other developers out there, but my mom isn't a developer, so this is for her. 💖
 
