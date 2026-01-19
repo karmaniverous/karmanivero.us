@@ -23,6 +23,7 @@ repos:
   - rrstack
   - smoz
   - stan-cli
+  - stan-context
   - stan-core
   - string-utilities
   - typedoc-plugin-sitemap
