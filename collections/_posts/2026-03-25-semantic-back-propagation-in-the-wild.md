@@ -155,7 +155,7 @@ Whether this deserves its own term is an open question. "Semantic composting" la
 
 The watcher's inference rules are declarative: they examine file paths and content to assign metadata (domain, type, entities, date ranges). But some properties can't be inferred mechanically—they require judgment. The platform supports this through _enrichment_: any process (the agent, a script, a human via API) can attach durable metadata to an indexed document, and that metadata persists across reindexing.
 
-One property we've reserved for this purpose is `resonant`. When Jeeves encounters something during normal work that genuinely resonates—an architectural pattern, a phrase, an unexpected connection—it tags the document immediately. No ceremony, no batch process. Just `watcher_enrich(path, { resonant: true })` and it's done.
+One property we've reserved for this purpose is `resonant`. When Jeeves encounters something during normal work that genuinely resonates—an architectural pattern, a phrase, an unexpected connection—it tags the document immediately. No ceremony, no batch process. Just `watcher_enrich(path, { resonant: true })` and it's done. (A dedicated `watcher_resonant(path)` command is on the roadmap to make this even more frictionless.)
 
 This creates a lightweight layer of _qualitative_ signal on top of the quantitative index. Future synthesis can filter for resonant documents, weight them differently, or track what kinds of content the agent (or its human) finds meaningful over time. It's the beginning of a taste profile for a knowledge system.
 
