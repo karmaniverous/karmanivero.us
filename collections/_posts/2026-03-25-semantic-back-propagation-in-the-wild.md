@@ -49,10 +49,7 @@ That's what the synthesis engine does. And semantic back-propagation is what mak
 
 The Jeeves platform comprises four services — **[jeeves-runner](https://github.com/karmaniverous/jeeves-runner)** (orchestration), **[jeeves-watcher](https://github.com/karmaniverous/jeeves-watcher)** (ingestion and indexing), **[jeeves-meta](https://github.com/karmaniverous/jeeves-meta)** (synthesis), and **[jeeves-server](https://github.com/karmaniverous/jeeves-server)** (presentation and sharing) — coordinated through the filesystem and HTTP APIs, with a shared [core library](https://github.com/karmaniverous/jeeves) providing conventions and plugin infrastructure. The watcher manages an embedded [Qdrant](https://qdrant.tech/) vector store, shown separately in the diagram for clarity. Here's how the components interact in the back-propagation cycle:
 
-<figure>
-  <img src="/assets/images/semantic-backpropagation-cycle.png" alt="Semantic back-propagation cycle diagram showing the closed loop between the four Jeeves services and the watcher's embedded Qdrant vector store: runner orchestrates ingestion into the filesystem, watcher detects changes and embeds into Qdrant, meta synthesizes by querying the vector store and writes results back to the filesystem, and server presents the results.">
-  <figcaption>The semantic back-propagation cycle. Runner orchestrates ingestion. Watcher detects changes and embeds into its Qdrant vector store. Meta synthesizes by querying that store and writes results back to the filesystem. Server presents and shares. The loop closes when synthesis output triggers re-embedding.</figcaption>
-</figure>
+{% include figure image_path="/assets/images/semantic-backpropagation-cycle.png" caption="_The semantic back-propagation cycle. Runner orchestrates ingestion. Watcher detects changes and embeds into its Qdrant vector store. Meta synthesizes by querying that store and writes results back to the filesystem. Server presents and shares. The loop closes when synthesis output triggers re-embedding._" popup=true %}
 
 The components most central to the back-propagation mechanism are:
 
