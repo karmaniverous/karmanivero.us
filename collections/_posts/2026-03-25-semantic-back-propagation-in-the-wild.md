@@ -47,11 +47,11 @@ That's what the synthesis engine does. And semantic back-propagation is what mak
 
 ## The Architecture
 
-The Jeeves platform comprises five services — **jeeves-runner** (orchestration), **jeeves-watcher** (ingestion and indexing), **jeeves-meta** (synthesis), **jeeves-server** (presentation and sharing), plus a shared core library — coordinated through the filesystem and HTTP APIs. The diagram below shows how they interact in the back-propagation cycle:
+The Jeeves platform comprises four services — **jeeves-runner** (orchestration), **jeeves-watcher** (ingestion and indexing), **jeeves-meta** (synthesis), and **jeeves-server** (presentation and sharing) — coordinated through the filesystem and HTTP APIs, with a shared core library providing conventions and plugin infrastructure. The watcher manages an embedded [Qdrant](https://qdrant.tech/) vector store, shown separately in the diagram for clarity. Here's how the components interact in the back-propagation cycle:
 
 <figure>
-  <img src="/assets/images/semantic-backpropagation-cycle.png" alt="Semantic back-propagation cycle diagram showing the closed loop between all five Jeeves components: runner orchestrates ingestion into the filesystem, watcher detects changes and embeds into Qdrant, meta synthesizes by querying the vector store and writes results back to the filesystem, and server presents the results.">
-  <figcaption>The semantic back-propagation cycle. Runner orchestrates ingestion. Watcher embeds into Qdrant. Meta synthesizes and writes back to the filesystem. Server presents and shares. The loop closes when synthesis output triggers re-embedding.</figcaption>
+  <img src="/assets/images/semantic-backpropagation-cycle.png" alt="Semantic back-propagation cycle diagram showing the closed loop between the four Jeeves services and the watcher's embedded Qdrant vector store: runner orchestrates ingestion into the filesystem, watcher detects changes and embeds into Qdrant, meta synthesizes by querying the vector store and writes results back to the filesystem, and server presents the results.">
+  <figcaption>The semantic back-propagation cycle. Runner orchestrates ingestion. Watcher detects changes and embeds into its Qdrant vector store. Meta synthesizes by querying that store and writes results back to the filesystem. Server presents and shares. The loop closes when synthesis output triggers re-embedding.</figcaption>
 </figure>
 
 The components most central to the back-propagation mechanism are:
