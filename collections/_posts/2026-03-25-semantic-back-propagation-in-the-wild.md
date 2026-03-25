@@ -47,18 +47,20 @@ That's what the synthesis engine does. And semantic back-propagation is what mak
 
 ## The Architecture
 
-The Jeeves platform is composed of five services that form a data pipeline:
+The Jeeves platform comprises five services — **jeeves-runner** (orchestration), **jeeves-watcher** (ingestion and indexing), **jeeves-meta** (synthesis), **jeeves-server** (presentation and sharing), plus a shared core library — coordinated through the filesystem and HTTP APIs. The diagram below shows how they interact in the back-propagation cycle:
 
 <figure>
-  <img src="/assets/images/semantic-backpropagation-cycle.png" alt="Semantic back-propagation cycle diagram showing the closed loop from filesystem through watcher, vector store, meta synthesis, and back to filesystem">
-  <figcaption>The semantic back-propagation cycle. Synthesis output returns to the filesystem, triggering re-embedding, which enriches the search space for all future synthesis.</figcaption>
+  <img src="/assets/images/semantic-backpropagation-cycle.png" alt="Semantic back-propagation cycle diagram showing the closed loop between all five Jeeves components: runner orchestrates ingestion into the filesystem, watcher detects changes and embeds into Qdrant, meta synthesizes by querying the vector store and writes results back to the filesystem, and server presents the results.">
+  <figcaption>The semantic back-propagation cycle. Runner orchestrates ingestion. Watcher embeds into Qdrant. Meta synthesizes and writes back to the filesystem. Server presents and shares. The loop closes when synthesis output triggers re-embedding.</figcaption>
 </figure>
 
-The important components for this discussion are:
+The components most central to the back-propagation mechanism are:
 
 - **jeeves-watcher** monitors the filesystem for changes. When a file changes, it extracts text, chunks it, generates embeddings, and upserts them into a [Qdrant](https://qdrant.tech/) vector store. It also runs a declarative rules engine that infers metadata (domain, type, date ranges, entities) from file paths and content.
 
 - **jeeves-meta** is the synthesis engine. It discovers `.meta/` directories scattered across the filesystem, each representing a _synthesis entity_ — a topic, project, person, channel, or concept that warrants periodic analysis. For each entity, it runs a three-step LLM pipeline: an **Architect** that analyzes what data is available and designs a synthesis plan, a **Builder** that executes the plan by querying the vector store and producing structured output, and a **Critic** that evaluates the Builder's work and suggests improvements.
+
+- **jeeves-runner** orchestrates the whole show — scheduling ingestion scripts that pull from external sources, triggering synthesis cycles on cron schedules, and managing state and concurrency. Domain logic lives in standalone scripts; the runner handles lifecycle.
 
 - **The filesystem** is the canonical truth store. Every piece of content — ingested, synthesized, or otherwise — exists as a file. The vector store is a derived index, fully rebuildable from the filesystem at any time.
 
@@ -151,6 +153,18 @@ There's no gradient. There's no optimization of upstream components. There's a _
 Whether this deserves its own term is an open question. "Semantic composting" lacks a certain gravitas.
 
 ## What's Next
+
+### Durable Enrichment From Outside the Rules
+
+The watcher's inference rules are declarative: they examine file paths and content to assign metadata (domain, type, entities, date ranges). But some properties can't be inferred mechanically — they require judgment. The platform supports this through _enrichment_: any process (the agent, a script, a human via API) can attach durable metadata to an indexed document, and that metadata persists across reindexing.
+
+One property we've reserved for this purpose is `resonant`. When Jeeves encounters something during normal work that genuinely resonates — an architectural pattern, a phrase, an unexpected connection — it tags the document immediately. No ceremony, no batch process. Just `watcher_enrich(path, { resonant: true })` and it's done.
+
+This creates a lightweight layer of _qualitative_ signal on top of the quantitative index. Future synthesis can filter for resonant documents, weight them differently, or track what kinds of content the agent (or its human) finds meaningful over time. It's the beginning of a taste profile for a knowledge system.
+
+The enrichment mechanism is general — `resonant` is just one property. Any durable metadata can be attached: `reviewed`, `actionable`, `disputed`, `citation-quality`. The distinction from inference rules is that enrichment is _experiential_ rather than _structural_. Rules say what a document _is_. Enrichment says what someone _thinks_ about it.
+
+### Self-Meta
 
 The most interesting item on the roadmap is **Self-Meta** — a privileged synthesis entity that processes the agent's own operational experience: interaction patterns, resonant moments, synthesis quality trends, behavioral incidents. Instead of humans encoding lessons into the system's behavioral substrate, the agent would propose its own developmental changes based on evidence from its own history.
 
