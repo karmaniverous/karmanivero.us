@@ -74,6 +74,21 @@ Configurably decorate entity objects with sharded index keys.
 
 </div>
 
+## fooboard
+
+A deployment status board that runs entirely in your browser: repos as rows, stages as columns, every cell showing what's deployed there and whether it's running, failed, behind or diverged. Reads GitHub Actions and AWS Amplify directly with your own credentials. No backend, no accounts, no tracking. Your AI assistant can set it up for you without ever seeing your keys.
+
+<div class="button-row--left">
+    <a href="/welcome-to-devops-hell/" class="btn btn--info btn--large">Article</a>
+
+    <a href="https://fooboard.dev/demo" class="btn btn--info btn--large">Live Demo</a>
+
+    <a href="https://fooboard.dev" class="btn btn--info btn--large">fooboard.dev</a>
+
+    <a href="https://github.com/karmaniverous/fooboard" class="btn btn--primary btn--large"><i class="fa-brands fa-github fa-2xl"></i></a>
+
+</div>
+
 ## get-dotenv
 
 Manage environment variables from dotenv files across multiple environments. Supports async/CLI operations, dynamic variables, custom CLI creation & more!
