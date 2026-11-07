@@ -1,0 +1,18 @@
+---
+layout: null
+permalink: /llms.txt
+sitemap: false
+---
+# karmanivero.us
+
+> Jason Williscroft's site: essays on software engineering and life, plus open-source TypeScript libraries, AWS and DynamoDB tooling, and the Jeeves AI assistant platform. API documentation for each project lives at https://docs.karmanivero.us/<project>/.
+
+## Project documentation
+
+{% for repo in site.data.docs_sites %}- [{{ repo.name }}](https://docs.karmanivero.us/{{ repo.name }}/): {{ repo.description }}
+{% endfor %}
+## Site
+
+- [Blog]({{ site.url }}/): essays and articles
+- [Entity Manager guide]({{ site.url }}/projects/entity-manager/): conceptual documentation for Entity Manager
+- [GitHub](https://github.com/karmaniverous): source for every project

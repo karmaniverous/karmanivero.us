@@ -1,0 +1,66 @@
+# Repos with a TypeDoc site at https://docs.karmanivero.us/<name>/.
+# Drives sitemap-index.xml and llms.txt. Keep sorted; add a repo when its docs site goes live.
+- name: aws-api-gateway-tools
+  description: "Tools and get-dotenv plugin for AWS API Gateway (REST APIs, stage cache, API keys)."
+- name: aws-cognito-tools
+  description: "X-Ray-enabled AWS Cognito client wrapper and get-dotenv CLI plugin."
+- name: aws-secrets-manager-tools
+  description: "Tools and get-dotenv plugin for AWS Secrets Manager env-map secrets."
+- name: aws-xray-tools
+  description: "Guarded AWS X-Ray capture utilities for AWS SDK v3 clients."
+- name: batch-process
+  description: "Process items asynchronously in a throttled, batched operation."
+- name: cached-axios
+  description: "Tag-aware caching for Axios: stable cache IDs, simple tag invalidation, and a drop-in Orval mutator on top of axios-cache-interceptor."
+- name: controlled-proxy
+  description: "Control & modify the behavior of any object non-destructively at runtime."
+- name: dynamodb-local
+  description: "Run DynamoDB Local in Docker via dockerode, for tests and local development."
+- name: entity-client-dynamodb
+  description: "Convenience wrapper for DynamoDB SDK with enhanced batch processing & EntityManager support."
+- name: entity-manager
+  description: "Rational indexing & cross-shard querying at scale in your NoSQL database so you can focus on your application logic."
+- name: entity-manager-demo
+  description: "A working demonstration of Entity Manager in action."
+- name: entity-tools
+  description: "Types & low-level functions for entity operations."
+- name: get-dotenv
+  description: "Manage environment variables from dotenv files across multiple environments. Supports async/CLI operations, dynamic variables, custom CLI creation & more."
+- name: hook-form-semantic
+  description: "React Hook Form components with Semantic UI React integration: date pickers, WYSIWYG editor, phone input, JSON editor, and more."
+- name: identity-engine
+  description: "Deterministic identity-resolution engine in TypeScript: Zod-validated handlers, mocked deps, and a CLI that mirrors the future HTTP API."
+- name: jeeves
+  description: "Identity, discipline, and data services for OpenClaw AI assistants."
+- name: jeeves-meta
+  description: "Knowledge synthesis engine for the Jeeves platform: discovers .meta/ directories, gathers context, and produces structured synthesis artifacts via an LLM pipeline."
+- name: jeeves-runner
+  description: "Graph-aware job execution engine with SQLite state. Part of the Jeeves platform."
+- name: jeeves-scripts-core
+  description: "Shared Jeeves scripts domains, runnable registry and CLI for jeeves-scripts instance repos."
+- name: jeeves-server
+  description: "Secure file browser, markdown viewer, and webhook gateway with Mermaid rendering, PDF/DOCX export and expiring share links."
+- name: jeeves-watcher
+  description: "Filesystem watcher that keeps a Qdrant vector store in sync with document changes. Config-driven rules engine, semantic search API, and CLI."
+- name: mock-db
+  description: "Mock DynamoDB-style query & scan behavior with local JSON data."
+- name: n8n-nodes-openclaw
+  description: "n8n community nodes for the OpenClaw Gateway API."
+- name: npm-package-template-ts
+  description: "A feature-rich NPM package template for TypeScript projects."
+- name: react-component-npm-package-template-ts
+  description: "A React component library template for TypeScript with ESM-only bundling, Vite playground, Vitest, ESLint/Prettier, TypeDoc and release-it."
+- name: rrstack
+  description: "Manage a stack of RRULEs."
+- name: serify-deserify
+  description: "Reversibly transform unserializable values into serializable ones. Includes Redux middleware."
+- name: smoz
+  description: "A TypeScript toolkit for AWS Lambda combining Serverless, Middy, OpenAPI 3.1 and Zod for schema-first apps."
+- name: stan-cli
+  description: "STAN Tames Autoregressive Nonsense: a CLI that bridges your IDE with your favorite LLM for design-first, AI-assisted development."
+- name: stan-context
+  description: "Deterministic dependency graph generator for STAN (LLM context selection)."
+- name: string-utilities
+  description: "Handy tagged template functions & other string utilities."
+- name: typedoc-plugin-sitemap
+  description: "Generate a sitemap for your TypeDoc documentation site."
