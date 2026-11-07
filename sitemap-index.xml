@@ -3,10 +3,10 @@ layout: null
 permalink: /sitemap-index.xml
 repos:
   - aws-api-gateway-tools
+  - aws-cognito-tools
   - aws-secrets-manager-tools
   - aws-xray-tools
   - batch-process
-  - batchable
   - cached-axios
   - controlled-proxy
   - dynamodb-local
@@ -16,15 +16,22 @@ repos:
   - entity-tools
   - get-dotenv
   - hook-form-semantic
-  - loggable
+  - identity-engine
+  - jeeves
+  - jeeves-meta
+  - jeeves-runner
+  - jeeves-scripts-core
+  - jeeves-server
+  - jeeves-watcher
   - mock-db
+  - n8n-nodes-openclaw
   - npm-package-template-ts
   - react-component-npm-package-template-ts
   - rrstack
+  - serify-deserify
   - smoz
   - stan-cli
   - stan-context
-  - stan-core
   - string-utilities
   - typedoc-plugin-sitemap
 ---
