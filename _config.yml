@@ -99,12 +99,16 @@ twitter:
 #   publisher:
 og_image: /assets/images/splash-header.jpg
 
-# For specifying social profiles
+# For specifying social profiles (schema.org JSON-LD sameAs on the home page)
 # - https://developers.google.com/structured-data/customize/social-profiles
-# social:
-#   type: # Person or Organization (defaults to Person)
-#   name: # If the user or organization name differs from the site's name
-#   links: # An array of links to social media profiles
+social:
+  type: Person
+  name: Jason Williscroft
+  links:
+    - https://github.com/karmaniverous
+    - https://www.linkedin.com/in/jscroft/
+    - https://x.com/karmaniverous
+    - https://techhub.social/@karmaniverous
 
 # Analytics
 analytics:

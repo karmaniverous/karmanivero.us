@@ -44,3 +44,9 @@
   data-key="BCZFcc5cO1t6meOPPnkW0g"
   async
 ></script>
+
+{% comment %}
+  The theme emits schema.org JSON-LD only when page.url is "/", but
+  jekyll-paginate-v2 renders the home page as /index.html, so it never fires.
+{% endcomment %}
+{% if page.url == "/index.html" %}{% include schema.html %}{% endif %}

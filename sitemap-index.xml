@@ -1,39 +1,6 @@
 ---
 layout: null
 permalink: /sitemap-index.xml
-repos:
-  - aws-api-gateway-tools
-  - aws-cognito-tools
-  - aws-secrets-manager-tools
-  - aws-xray-tools
-  - batch-process
-  - cached-axios
-  - controlled-proxy
-  - dynamodb-local
-  - entity-client-dynamodb
-  - entity-manager
-  - entity-manager-demo
-  - entity-tools
-  - get-dotenv
-  - hook-form-semantic
-  - identity-engine
-  - jeeves
-  - jeeves-meta
-  - jeeves-runner
-  - jeeves-scripts-core
-  - jeeves-server
-  - jeeves-watcher
-  - mock-db
-  - n8n-nodes-openclaw
-  - npm-package-template-ts
-  - react-component-npm-package-template-ts
-  - rrstack
-  - serify-deserify
-  - smoz
-  - stan-cli
-  - stan-context
-  - string-utilities
-  - typedoc-plugin-sitemap
 ---
 
 <?xml version="1.0" encoding="UTF-8"?>
@@ -42,9 +9,9 @@ repos:
     <loc>{{ site.url }}/sitemap.xml</loc>
   </sitemap>
 
-  {% for repo in page.repos %}
+  {% for repo in site.data.docs_sites %}
   <sitemap>
-    <loc>https://docs.karmanivero.us/{{ repo }}/sitemap.xml</loc>
+    <loc>https://docs.karmanivero.us/{{ repo.name }}/sitemap.xml</loc>
   </sitemap>
   {% endfor %}
 </sitemapindex>
